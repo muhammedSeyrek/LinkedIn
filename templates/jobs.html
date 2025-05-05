@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %} - İşlerim{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">İşlerim</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Tamamlanan İşler</h3>
+                </div>
+                <div class="card-body">
+                    {% if completed_jobs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Anahtar Kelimeler</th>
+                                        <th>Lokasyon</th>
+                                        <th>Bulunan İlanlar</th>
+                                        <th>Tamamlanma Tarihi</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job_id, job in completed_jobs.items() %}
+                                        <tr>
+                                            <td><code>{{ job_id[:8] }}...</code></td>
+                                            <td>{{ job.params.keywords }}</td>
+                                            <td>{{ job.params.location or "Belirtilmedi" }}</td>
+                                            <td>{{ job.found_jobs or 0 }}</td>
+                                            <td>{{ job.completed_at }}</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="{{ url_for('job_status', job_id=job_id) }}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-info-circle"></i> Detaylar
+                                                    </a>
+                                                    {% if job.status == 'completed' and job.result_file %}
+                                                        <a href="{{ url_for('download_results', job_id=job_id) }}" class="btn btn-sm btn-success">
+                                                            <i class="fas fa-download"></i> İndir
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            Henüz tamamlanmış iş bulunmuyor.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Devam Eden İşler</h3>
+                </div>
+                <div class="card-body">
+                    {% if active_jobs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Anahtar Kelimeler</th>
+                                        <th>Durum</th>
+                                        <th>İlerleme</th>
+                                        <th>Başlangıç Tarihi</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job_id, job in active_jobs.items() %}
+                                        <tr>
+                                            <td><code>{{ job_id[:8] }}...</code></td>
+                                            <td>{{ job.params.keywords }}</td>
+                                            <td>
+                                                <span class="badge status-badge status-{{ job.status }}">
+                                                    {% if job.status == 'queued' %}
+                                                        Sırada
+                                                    {% elif job.status == 'running' %}
+                                                        Çalışıyor
+                                                    {% endif %}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="progress" style="height: 15px;">
+                                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                                         role="progressbar" style="width: {{ job.progress }}%;" 
+                                                         aria-valuenow="{{ job.progress }}" aria-valuemin="0" aria-valuemax="100">
+                                                        {{ job.progress }}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ job.created_at }}</td>
+                                            <td>
+                                                <a href="{{ url_for('job_status', job_id=job_id) }}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i> İzle
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            Şu anda çalışan iş bulunmuyor.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="fas fa-search me-2"></i>Yeni Arama Yap
+        </a>
+    </div>
+</div>
+{% endblock %}
