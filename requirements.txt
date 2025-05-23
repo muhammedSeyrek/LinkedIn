@@ -1,4 +1,7 @@
 flask==2.3.3
-pandas==2.0.3
-selenium==4.11.2
-webdriver-manager==3.8.6
+pandas>=2.2.0
+selenium==4.15.2
+webdriver-manager==4.0.1
+python-dotenv==1.0.0
+requests==2.31.0
+numpy>=1.26.3
