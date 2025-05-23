@@ -1,134 +1,198 @@
 {% extends "base.html" %}
 
-{% block title %} - İşlerim{% endblock %}
+{% block title %}Aramalarım{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h1 class="mb-4">İşlerim</h1>
-    
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h3 class="mb-0">Tamamlanan İşler</h3>
-                </div>
-                <div class="card-body">
-                    {% if completed_jobs %}
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Anahtar Kelimeler</th>
-                                        <th>Lokasyon</th>
-                                        <th>Bulunan İlanlar</th>
-                                        <th>Tamamlanma Tarihi</th>
-                                        <th>İşlemler</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for job_id, job in completed_jobs.items() %}
-                                        <tr>
-                                            <td><code>{{ job_id[:8] }}...</code></td>
-                                            <td>{{ job.params.keywords }}</td>
-                                            <td>{{ job.params.location or "Belirtilmedi" }}</td>
-                                            <td>{{ job.found_jobs or 0 }}</td>
-                                            <td>{{ job.completed_at }}</td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <a href="{{ url_for('job_status', job_id=job_id) }}" class="btn btn-sm btn-info">
-                                                        <i class="fas fa-info-circle"></i> Detaylar
-                                                    </a>
-                                                    {% if job.status == 'completed' and job.result_file %}
-                                                        <a href="{{ url_for('download_results', job_id=job_id) }}" class="btn btn-sm btn-success">
-                                                            <i class="fas fa-download"></i> İndir
-                                                        </a>
-                                                    {% endif %}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info mb-0">
-                            Henüz tamamlanmış iş bulunmuyor.
-                        </div>
-                    {% endif %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Intro Card -->
+        <div class="card mb-4">
+            <div class="card-body text-center py-4">
+                <h1 class="card-title mb-3">Aramalarım</h1>
+                <p class="lead mb-4">Önceki aramalarınızı görüntüleyin ve sonuçları indirin.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-search me-2"></i>Yeni Arama Başlat
+                </a>
+            </div>
+        </div>
+
+        <!-- Jobs List -->
+        {% if jobs %}
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Arama Detayları</th>
+                                <th>Durum</th>
+                                <th>Sonuçlar</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs %}
+                            <tr>
+                                <!-- Arama Detayları -->
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="job-icon me-3">
+                                            <i class="fas fa-briefcase fa-2x text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1">{{ job.params.keywords }}</h5>
+                                            <div class="small text-muted">
+                                                {% if job.params.location %}
+                                                <i class="fas fa-map-marker-alt me-1"></i>{{ job.params.location }}
+                                                {% endif %}
+                                                <span class="mx-2">•</span>
+                                                <i class="far fa-clock me-1"></i>{{ job.created_at }}
+                                            </div>
+                                            <div class="mt-2">
+                                                {% if job.params.job_types %}
+                                                    {% for type in job.params.job_types %}
+                                                        <span class="badge bg-light text-dark me-1">
+                                                            {% if type == 'F' %}Tam Zamanlı
+                                                            {% elif type == 'P' %}Yarı Zamanlı
+                                                            {% elif type == 'C' %}Sözleşmeli
+                                                            {% elif type == 'T' %}Geçici
+                                                            {% elif type == 'I' %}Staj
+                                                            {% endif %}
+                                                        </span>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Durum -->
+                                <td>
+                                    {% if job.status == 'completed' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Tamamlandı
+                                        </span>
+                                        {% if job.found_jobs %}
+                                        <div class="small text-muted mt-1">
+                                            {{ job.found_jobs }} ilan bulundu
+                                        </div>
+                                        {% endif %}
+                                    {% elif job.status == 'running' %}
+                                        <span class="badge bg-primary">
+                                            <i class="fas fa-sync-alt fa-spin me-1"></i>Devam Ediyor
+                                        </span>
+                                        <div class="small text-muted mt-1">
+                                            %{{ job.progress }} tamamlandı
+                                        </div>
+                                    {% elif job.status == 'failed' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-exclamation-circle me-1"></i>Başarısız
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-clock me-1"></i>Bekliyor
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Sonuçlar -->
+                                <td>
+                                    {% if job.status == 'completed' and job.result_file %}
+                                        <a href="{{ url_for('download_results', job_id=job.id) }}" 
+                                           class="btn btn-success btn-sm">
+                                            <i class="fas fa-download me-1"></i>İndir
+                                        </a>
+                                    {% elif job.status == 'running' %}
+                                        <a href="{{ url_for('job_status', job_id=job.id) }}" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>İlerleyişi Gör
+                                        </a>
+                                    {% elif job.status == 'failed' %}
+                                        <button class="btn btn-outline-danger btn-sm" 
+                                                data-bs-toggle="tooltip" 
+                                                title="{{ job.error }}">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Hata Detayı
+                                        </button>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- İşlemler -->
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('job_status', job_id=job.id) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-info-circle me-1"></i>Detaylar
+                                        </a>
+                                        {% if job.status == 'completed' %}
+                                        <button class="btn btn-outline-success btn-sm" 
+                                                onclick="duplicateSearch('{{ job.params.keywords }}', '{{ job.params.location }}')">
+                                            <i class="fas fa-copy me-1"></i>Tekrarla
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Devam Eden İşler</h3>
+        {% else %}
+        <!-- No Jobs Message -->
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-search fa-4x text-muted"></i>
                 </div>
-                <div class="card-body">
-                    {% if active_jobs %}
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Anahtar Kelimeler</th>
-                                        <th>Durum</th>
-                                        <th>İlerleme</th>
-                                        <th>Başlangıç Tarihi</th>
-                                        <th>İşlemler</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for job_id, job in active_jobs.items() %}
-                                        <tr>
-                                            <td><code>{{ job_id[:8] }}...</code></td>
-                                            <td>{{ job.params.keywords }}</td>
-                                            <td>
-                                                <span class="badge status-badge status-{{ job.status }}">
-                                                    {% if job.status == 'queued' %}
-                                                        Sırada
-                                                    {% elif job.status == 'running' %}
-                                                        Çalışıyor
-                                                    {% endif %}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="progress" style="height: 15px;">
-                                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                                         role="progressbar" style="width: {{ job.progress }}%;" 
-                                                         aria-valuenow="{{ job.progress }}" aria-valuemin="0" aria-valuemax="100">
-                                                        {{ job.progress }}%
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>{{ job.created_at }}</td>
-                                            <td>
-                                                <a href="{{ url_for('job_status', job_id=job_id) }}" class="btn btn-sm btn-info">
-                                                    <i class="fas fa-eye"></i> İzle
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info mb-0">
-                            Şu anda çalışan iş bulunmuyor.
-                        </div>
-                    {% endif %}
-                </div>
+                <h3>Henüz Bir Arama Yapmadınız</h3>
+                <p class="text-muted mb-4">LinkedIn'deki iş ilanlarını aramak için yeni bir arama başlatın.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-search me-2"></i>İlk Aramayı Başlat
+                </a>
             </div>
         </div>
-    </div>
-    
-    <div class="mt-4">
-        <a href="{{ url_for('index') }}" class="btn btn-primary">
-            <i class="fas fa-search me-2"></i>Yeni Arama Yap
-        </a>
+        {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Tooltip'leri etkinleştir
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+});
+
+// Aramayı tekrarla
+function duplicateSearch(keywords, location) {
+    // Form oluştur
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("start_search") }}';
+
+    // Keywords input
+    var keywordsInput = document.createElement('input');
+    keywordsInput.type = 'hidden';
+    keywordsInput.name = 'keywords';
+    keywordsInput.value = keywords;
+    form.appendChild(keywordsInput);
+
+    // Location input
+    if (location) {
+        var locationInput = document.createElement('input');
+        locationInput.type = 'hidden';
+        locationInput.name = 'location';
+        locationInput.value = location;
+        form.appendChild(locationInput);
+    }
+
+    // Formu sayfaya ekle ve gönder
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
 {% endblock %}

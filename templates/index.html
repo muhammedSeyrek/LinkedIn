@@ -1,233 +1,254 @@
 {% extends "base.html" %}
 
-{% block title %} - Ana Sayfa{% endblock %}
+{% block title %}Ana Sayfa{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <h1 class="display-4 fw-bold mb-4">LinkedIn İş Tarayıcısı</h1>
-                <p class="lead mb-4">LinkedIn'deki iş ilanlarını kolayca tarayın, analiz edin ve kariyerinizde bir adım öne geçin.</p>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                    <a href="#search-form" class="btn btn-light btn-lg px-4 me-md-2 fw-bold">Şimdi Başla</a>
-                </div>
-            </div>
-            <div class="col-lg-5 d-none d-lg-block text-center">
-                <i class="fas fa-search fa-10x text-white opacity-50 pulse-animation"></i>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="container mb-5">
-    <div class="row text-center">
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <i class="fas fa-bolt feature-icon"></i>
-                    <h3>Hızlı Tarama</h3>
-                    <p>LinkedIn'deki binlerce iş ilanını saniyeler içinde tarayın.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <i class="fas fa-filter feature-icon"></i>
-                    <h3>Gelişmiş Filtreleme</h3>
-                    <p>İş türü, deneyim seviyesi ve lokasyon gibi çeşitli filtrelerle arama yapın.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <i class="fas fa-file-csv feature-icon"></i>
-                    <h3>Kolay Dışa Aktarım</h3>
-                    <p>Bulunan iş ilanlarını CSV formatında indirin ve analiz edin.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- How It Works Section -->
-<section class="container mb-5">
-    <h2 class="text-center mb-5">Nasıl Çalışır?</h2>
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="timeline-item">
-                <div class="d-flex align-items-center">
-                    <div class="step-icon">1</div>
-                    <h4>Arama Kriterlerini Belirleyin</h4>
-                </div>
-                <p class="mt-2">Anahtar kelimelerinizi, lokasyonunuzu ve diğer filtreleri seçin.</p>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="d-flex align-items-center">
-                    <div class="step-icon">2</div>
-                    <h4>Taramayı Başlatın</h4>
-                </div>
-                <p class="mt-2">Tüm alanları doldurduktan sonra aramayı başlatın ve sistemin işleri bulmasını bekleyin.</p>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="d-flex align-items-center">
-                    <div class="step-icon">3</div>
-                    <h4>Sonuçları İnceleyin</h4>
-                </div>
-                <p class="mt-2">Bulunan iş ilanlarını inceleyip CSV olarak indirin.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Search Form Section -->
-<section class="container mb-5" id="search-form">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="mb-0">İş Araması Başlat</h3>
-                </div>
-                <div class="card-body search-form">
-                    <form action="{{ url_for('start_search') }}" method="post">
-                        <div class="mb-4">
-                            <label for="keywords" class="form-label">Aranacak Pozisyon / Anahtar Kelimeler <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-lg" id="keywords" name="keywords" placeholder="Örn: Python Developer, Veri Bilimci, Pazarlama Uzmanı" required>
-                            <div class="form-text">Aramak istediğiniz pozisyon veya anahtar kelimeleri girin.</div>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Intro Section -->
+        <div class="card mb-4">
+            <div class="card-body text-center py-5" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+                <h1 class="display-4 mb-3">LinkedIn İş Arama Asistanı</h1>
+                <p class="lead mb-4">LinkedIn'deki iş ilanlarını otomatik olarak tarayın, analiz edin ve kaydedin.</p>
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#search-form" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-2"></i>Aramaya Başla
+                            </a>
+                            <a href="{{ url_for('jobs_list') }}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-history me-2"></i>Önceki Aramalar
+                            </a>
                         </div>
-                        
-                        <div class="mb-4">
-                            <label for="location" class="form-label">Lokasyon</label>
-                            <input type="text" class="form-control" id="location" name="location" placeholder="Örn: İstanbul, Türkiye">
-                            <div class="form-text">İş aramak istediğiniz konumu belirtin. Boş bırakırsanız tüm konumlarda arama yapılır.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Form -->
+        <div class="card" id="search-form">
+            <div class="card-body">
+                <h2 class="card-title mb-4">İş Arama Kriterleri</h2>
+                <form action="{{ url_for('start_search') }}" method="POST" id="jobSearchForm">
+                    <!-- Temel Arama -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Anahtar Kelimeler <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="keywords" required
+                                    placeholder="Örn: Python Developer, Data Scientist">
+                                <div class="form-text">Pozisyon, beceri veya şirket adı girebilirsiniz</div>
+                            </div>
                         </div>
-                        
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label">İş Türü</label>
-                                <div class="border rounded p-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Lokasyon</label>
+                                <input type="text" class="form-control" name="location"
+                                    placeholder="Örn: İstanbul, Türkiye">
+                                <div class="form-text">Boş bırakırsanız tüm lokasyonlarda arama yapılır</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detaylı Filtreler -->
+                    <div class="row mb-4">
+                        <!-- İş Türü -->
+                        <div class="col-md-4">
+                            <label class="form-label">İş Türü</label>
+                            <div class="card">
+                                <div class="card-body">
                                     <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="job_types" value="F" id="fulltime">
-                                        <label class="form-check-label" for="fulltime">Tam Zamanlı</label>
+                                        <input class="form-check-input" type="checkbox" name="job_types" value="F" id="fullTime">
+                                        <label class="form-check-label" for="fullTime">
+                                            <i class="fas fa-business-time me-2"></i>Tam Zamanlı
+                                        </label>
                                     </div>
                                     <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="job_types" value="P" id="parttime">
-                                        <label class="form-check-label" for="parttime">Yarı Zamanlı</label>
+                                        <input class="form-check-input" type="checkbox" name="job_types" value="P" id="partTime">
+                                        <label class="form-check-label" for="partTime">
+                                            <i class="fas fa-clock me-2"></i>Yarı Zamanlı
+                                        </label>
                                     </div>
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="checkbox" name="job_types" value="C" id="contract">
-                                        <label class="form-check-label" for="contract">Sözleşmeli</label>
+                                        <label class="form-check-label" for="contract">
+                                            <i class="fas fa-file-contract me-2"></i>Sözleşmeli
+                                        </label>
                                     </div>
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="checkbox" name="job_types" value="T" id="temporary">
-                                        <label class="form-check-label" for="temporary">Geçici</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="job_types" value="I" id="internship">
-                                        <label class="form-check-label" for="internship">Staj</label>
+                                        <label class="form-check-label" for="temporary">
+                                            <i class="fas fa-hourglass-half me-2"></i>Geçici
+                                        </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="job_types" value="V" id="volunteer">
-                                        <label class="form-check-label" for="volunteer">Gönüllü</label>
+                                        <input class="form-check-input" type="checkbox" name="job_types" value="I" id="internship">
+                                        <label class="form-check-label" for="internship">
+                                            <i class="fas fa-graduation-cap me-2"></i>Staj
+                                        </label>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="col-md-6 mt-3 mt-md-0">
-                                <label class="form-label">Deneyim Seviyesi</label>
-                                <div class="border rounded p-3">
+                        </div>
+
+                        <!-- Deneyim Seviyesi -->
+                        <div class="col-md-4">
+                            <label class="form-label">Deneyim Seviyesi</label>
+                            <div class="card">
+                                <div class="card-body">
                                     <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="1" id="internship_level">
-                                        <label class="form-check-label" for="internship_level">Stajyer</label>
+                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="1" id="internLevel">
+                                        <label class="form-check-label" for="internLevel">
+                                            <i class="fas fa-seedling me-2"></i>Stajyer
+                                        </label>
                                     </div>
                                     <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="2" id="entry_level">
-                                        <label class="form-check-label" for="entry_level">Giriş Seviyesi</label>
+                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="2" id="entryLevel">
+                                        <label class="form-check-label" for="entryLevel">
+                                            <i class="fas fa-baby me-2"></i>Yeni Mezun
+                                        </label>
                                     </div>
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="checkbox" name="experience_levels" value="3" id="associate">
-                                        <label class="form-check-label" for="associate">Orta Seviye</label>
+                                        <label class="form-check-label" for="associate">
+                                            <i class="fas fa-user me-2"></i>Orta Düzey
+                                        </label>
                                     </div>
                                     <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="4" id="mid_senior">
-                                        <label class="form-check-label" for="mid_senior">Kıdemli</label>
+                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="4" id="midSenior">
+                                        <label class="form-check-label" for="midSenior">
+                                            <i class="fas fa-user-tie me-2"></i>Kıdemli
+                                        </label>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" name="experience_levels" value="5" id="director">
-                                        <label class="form-check-label" for="director">Direktör/Yönetici</label>
+                                        <label class="form-check-label" for="director">
+                                            <i class="fas fa-chess-king me-2"></i>Direktör
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Uzaktan Çalışma</label>
-                                <div class="border rounded p-3">
+
+                        <!-- Uzaktan Çalışma -->
+                        <div class="col-md-4">
+                            <label class="form-label">Uzaktan Çalışma</label>
+                            <div class="card">
+                                <div class="card-body">
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="checkbox" name="remote_options" value="1" id="remote">
-                                        <label class="form-check-label" for="remote">Uzaktan</label>
+                                        <label class="form-check-label" for="remote">
+                                            <i class="fas fa-home me-2"></i>Uzaktan
+                                        </label>
                                     </div>
                                     <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="remote_options" value="2" id="onsite">
-                                        <label class="form-check-label" for="onsite">Ofiste</label>
+                                        <input class="form-check-input" type="checkbox" name="remote_options" value="2" id="hybrid">
+                                        <label class="form-check-label" for="hybrid">
+                                            <i class="fas fa-building-user me-2"></i>Hibrit
+                                        </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="remote_options" value="3" id="hybrid">
-                                        <label class="form-check-label" for="hybrid">Hibrit</label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6 mt-3 mt-md-0">
-                                <label class="form-label">İlan Tarihi</label>
-                                <div class="border rounded p-3">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="radio" name="date_posted" value="r86400" id="last_24">
-                                        <label class="form-check-label" for="last_24">Son 24 saat</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="radio" name="date_posted" value="r604800" id="last_week">
-                                        <label class="form-check-label" for="last_week">Son 7 gün</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="radio" name="date_posted" value="r2592000" id="last_month">
-                                        <label class="form-check-label" for="last_month">Son 30 gün</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="date_posted" value="" id="any_time" checked>
-                                        <label class="form-check-label" for="any_time">Herhangi bir zaman</label>
+                                        <input class="form-check-input" type="checkbox" name="remote_options" value="3" id="onsite">
+                                        <label class="form-check-label" for="onsite">
+                                            <i class="fas fa-building me-2"></i>Ofiste
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="mb-4">
-                            <label for="max_pages" class="form-label">Taranacak Maksimum Sayfa Sayısı</label>
-                            <select class="form-select" id="max_pages" name="max_pages">
-                                <option value="1">1 sayfa (yaklaşık 25 ilan)</option>
-                                <option value="3" selected>3 sayfa (yaklaşık 75 ilan)</option>
-                                <option value="5">5 sayfa (yaklaşık 125 ilan)</option>
-                                <option value="10">10 sayfa (yaklaşık 250 ilan)</option>
+                    </div>
+
+                    <!-- İlan Tarihi -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">İlan Tarihi</label>
+                            <select class="form-select" name="date_posted">
+                                <option value="">Tüm Zamanlar</option>
+                                <option value="r86400">Son 24 Saat</option>
+                                <option value="r604800">Son 1 Hafta</option>
+                                <option value="r2592000">Son 30 Gün</option>
                             </select>
-                            <div class="form-text">Daha fazla sayfa taramak daha uzun sürer ama daha fazla sonuç bulmanızı sağlar.</div>
                         </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-search me-2"></i>Aramayı Başlat
-                            </button>
+                        <div class="col-md-6">
+                            <label class="form-label">Sayfa Sayısı</label>
+                            <input type="number" class="form-control" name="max_pages" value="5" min="1" max="20">
+                            <div class="form-text">Her sayfada yaklaşık 25 ilan listelenir</div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+
+                    <!-- LinkedIn Giriş Bilgileri (Opsiyonel) -->
+                    <div class="card mb-4 border-info">
+                        <div class="card-header bg-info bg-opacity-10 border-info">
+                            <h5 class="card-title mb-0">
+                                <i class="fab fa-linkedin me-2"></i>LinkedIn Giriş Bilgileri (Opsiyonel)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted mb-3">
+                                LinkedIn hesabınızla giriş yaparak daha fazla iş ilanına erişebilirsiniz.
+                                Bilgileriniz güvenli bir şekilde saklanır ve sadece arama için kullanılır.
+                            </p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">LinkedIn E-posta</label>
+                                        <input type="email" class="form-control" name="email" placeholder="ornek@email.com">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">LinkedIn Şifre</label>
+                                        <input type="password" class="form-control" name="password">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>Aramayı Başlat
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</section>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.getElementById('jobSearchForm');
+    form.addEventListener('submit', function(event) {
+        const keywords = form.querySelector('input[name="keywords"]').value.trim();
+        if (!keywords) {
+            event.preventDefault();
+            alert('Lütfen en az bir anahtar kelime girin.');
+            return false;
+        }
+        showLoading();
+    });
+
+    // Checkbox group validation
+    const jobTypeChecks = document.querySelectorAll('input[name="job_types"]');
+    const expLevelChecks = document.querySelectorAll('input[name="experience_levels"]');
+    const remoteChecks = document.querySelectorAll('input[name="remote_options"]');
+
+    function validateCheckboxGroup(checkboxes) {
+        return Array.from(checkboxes).some(cb => cb.checked);
+    }
+
+    // Smooth scroll to search form
+    document.querySelector('a[href="#search-form"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector('#search-form').scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

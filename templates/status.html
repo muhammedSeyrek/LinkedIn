@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} - İş Durumu{% endblock %}
+{% block title %}Arama Durumu{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -34,164 +34,101 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row">
-        <div class="col-lg-10 mx-auto">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Ana Sayfa</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url_for('jobs_list') }}">İşlerim</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">İş Durumu</li>
-                </ol>
-            </nav>
-            
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="mb-0">İş Durumu</h3>
-                        <span class="badge status-badge status-{{ job.status }}">
-                            {% if job.status == 'queued' %}
-                                Sırada
-                            {% elif job.status == 'running' %}
-                                Çalışıyor
-                            {% elif job.status == 'completed' %}
-                                Tamamlandı
-                            {% elif job.status == 'failed' %}
-                                Başarısız
-                            {% endif %}
-                        </span>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div id="statusContainer">
+                    <!-- Arama Durumu -->
+                    <div class="text-center mb-4">
+                        <div class="status-icon mb-3">
+                            <i class="fas fa-search fa-3x text-primary"></i>
+                        </div>
+                        <h2 class="card-title mb-3">Arama Durumu</h2>
+                        <p class="lead mb-0" id="statusText">İş ilanları aranıyor...</p>
+                    </div>
+
+                    <!-- İlerleme Çubuğu -->
+                    <div class="progress mb-4" style="height: 10px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             id="progressBar"
+                             style="width: 0%;"
+                             aria-valuenow="0" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+
+                    <!-- Detaylı Bilgiler -->
+                    <div class="row text-center mb-4">
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <i class="fas fa-clock text-primary mb-2"></i>
+                                    <h5 class="card-title">Geçen Süre</h5>
+                                    <p class="card-text" id="elapsedTime">0:00</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <i class="fas fa-file-alt text-primary mb-2"></i>
+                                    <h5 class="card-title">Taranan Sayfa</h5>
+                                    <p class="card-text" id="currentPage">0 / 0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <i class="fas fa-briefcase text-primary mb-2"></i>
+                                    <h5 class="card-title">Bulunan İlanlar</h5>
+                                    <p class="card-text" id="foundJobs">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Durum Mesajları -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-info-circle me-2"></i>Son Durum
+                            </h5>
+                            <div class="status-messages" id="statusMessages">
+                                <div class="placeholder-glow">
+                                    <span class="placeholder col-12"></span>
+                                    <span class="placeholder col-12"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sonuç Butonları -->
+                    <div class="text-center" id="resultButtons" style="display: none;">
+                        <div class="btn-group">
+                            <a href="{{ url_for('download_results', job_id=job_id) }}" class="btn btn-success">
+                                <i class="fas fa-download me-2"></i>Sonuçları İndir
+                            </a>
+                            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Yeni Arama
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Hata Mesajı -->
+                    <div class="alert alert-danger" id="errorMessage" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="errorText"></span>
+                        <div class="mt-3">
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-danger">
+                                <i class="fas fa-redo me-2"></i>Yeniden Dene
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-lg-6">
-                            <h4>İş Bilgileri</h4>
-                            <table class="table table-sm">
-                                <tr>
-                                    <th>İş ID:</th>
-                                    <td>{{ job.id }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Oluşturulma Tarihi:</th>
-                                    <td>{{ job.created_at }}</td>
-                                </tr>
-                                {% if job.status == 'completed' and job.completed_at %}
-                                <tr>
-                                    <th>Tamamlanma Tarihi:</th>
-                                    <td>{{ job.completed_at }}</td>
-                                </tr>
-                                {% endif %}
-                                <tr>
-                                    <th>Anahtar Kelimeler:</th>
-                                    <td>{{ job.params.keywords }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Lokasyon:</th>
-                                    <td>{{ job.params.location or 'Belirtilmedi' }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                        
-                        <div class="col-lg-6">
-                            <h4>Arama Parametreleri</h4>
-                            <table class="table table-sm">
-                                <tr>
-                                    <th>İş Türleri:</th>
-                                    <td>
-                                        {% if job.params.job_types|length %}
-                                            {% for jt in job.params.job_types %}
-                                                {% if jt == 'F' %}Tam Zamanlı{% endif %}
-                                                {% if jt == 'P' %}Yarı Zamanlı{% endif %}
-                                                {% if jt == 'C' %}Sözleşmeli{% endif %}
-                                                {% if jt == 'T' %}Geçici{% endif %}
-                                                {% if jt == 'I' %}Staj{% endif %}
-                                                {% if jt == 'V' %}Gönüllü{% endif %}
-                                                {% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            Hepsi
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Deneyim Seviyesi:</th>
-                                    <td>
-                                        {% if job.params.experience_levels|length %}
-                                            {% for exp in job.params.experience_levels %}
-                                                {% if exp == '1' %}Stajyer{% endif %}
-                                                {% if exp == '2' %}Giriş Seviyesi{% endif %}
-                                                {% if exp == '3' %}Orta Seviye{% endif %}
-                                                {% if exp == '4' %}Kıdemli{% endif %}
-                                                {% if exp == '5' %}Direktör/Yönetici{% endif %}
-                                                {% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            Hepsi
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Maksimum Sayfa:</th>
-                                    <td>{{ job.params.max_pages }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h4>İlerleme</h4>
-                        <div class="progress mb-2" style="height: 25px;">
-                            <div class="progress-bar progress-bar-striped 
-                                {% if job.status == 'running' %}progress-bar-animated{% endif %}"
-                                 role="progressbar" style="width: {{ job.progress }}%;" 
-                                 aria-valuenow="{{ job.progress }}" aria-valuemin="0" aria-valuemax="100">
-                                {{ job.progress }}%
-                            </div>
-                        </div>
-                        <div class="mt-2 d-flex justify-content-between">
-                            <div>
-                                <span class="badge bg-info">Sayfa: {{ job.page or 0 }}/{{ job.total_pages or job.params.max_pages }}</span>
-                            </div>
-                            <div>
-                                <span class="badge bg-success">Bulunan İlanlar: {{ job.found_jobs or 0 }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {% if job.status == 'completed' and job.result_file %}
-                        <div class="mb-4">
-                            <div class="alert alert-success">
-                                <h4 class="alert-heading">İş Tamamlandı!</h4>
-                                <p>Toplam {{ job.found_jobs }} iş ilanı bulundu.</p>
-                                <hr>
-                                <a href="{{ url_for('download_results', job_id=job.id) }}" class="btn btn-success">
-                                    <i class="fas fa-download me-2"></i>CSV Dosyasını İndir
-                                </a>
-                            </div>
-                        </div>
-                    {% elif job.status == 'failed' %}
-                        <div class="mb-4">
-                            <div class="alert alert-danger">
-                                <h4 class="alert-heading">İşlemde Hata!</h4>
-                                <p>İş arama işlemi sırasında bir hata oluştu:</p>
-                                <pre>{{ job.error }}</pre>
-                                <hr>
-                                <a href="{{ url_for('index') }}" class="btn btn-primary">
-                                    <i class="fas fa-redo me-2"></i>Yeni Arama Yap
-                                </a>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="d-flex justify-content-between">
-                <a href="{{ url_for('jobs_list') }}" class="btn btn-secondary">
-                    <i class="fas fa-list me-2"></i>Tüm İşlere Dön
-                </a>
-                <a href="{{ url_for('index') }}" class="btn btn-primary">
-                    <i class="fas fa-search me-2"></i>Yeni Arama Yap
-                </a>
             </div>
         </div>
     </div>
@@ -200,31 +137,89 @@
 
 {% block extra_js %}
 <script>
-    // Durum güncellemesi için AJAX
-    {% if job.status == 'queued' or job.status == 'running' %}
-    function updateStatus() {
-        fetch('{{ url_for("api_job_status", job_id=job.id) }}')
-            .then(response => response.json())
-            .then(data => {
-                // İlerleme çubuğunu güncelle
-                document.querySelector('.progress-bar').style.width = data.progress + '%';
-                document.querySelector('.progress-bar').setAttribute('aria-valuenow', data.progress);
-                document.querySelector('.progress-bar').textContent = data.progress + '%';
-                
-                // Sayfa ve bulunan iş sayısını güncelle
-                document.querySelector('.badge.bg-info').textContent = 'Sayfa: ' + (data.page || 0) + '/' + (data.total_pages || {{ job.params.max_pages }});
-                document.querySelector('.badge.bg-success').textContent = 'Bulunan İlanlar: ' + (data.found_jobs || 0);
-                
-                // İş tamamlandıysa sayfayı yenile
-                if (data.status === 'completed' || data.status === 'failed') {
-                    location.reload();
-                }
-            })
-            .catch(error => console.error('Status update error:', error));
-    }
+let startTime = new Date();
+let statusMessages = [];
 
-    // Her 3 saniyede bir güncelle
-    setInterval(updateStatus, 3000);
-    {% endif %}
+function updateElapsedTime() {
+    const now = new Date();
+    const elapsed = Math.floor((now - startTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    document.getElementById('elapsedTime').textContent = 
+        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function updateStatusMessages(message) {
+    if (message && !statusMessages.includes(message)) {
+        statusMessages.unshift(message);
+        if (statusMessages.length > 5) statusMessages.pop();
+        
+        const messagesHtml = statusMessages.map(msg => 
+            `<div class="status-message">
+                <i class="fas fa-circle text-primary me-2" style="font-size: 0.5em; vertical-align: middle;"></i>
+                ${msg}
+            </div>`
+        ).join('');
+        
+        document.getElementById('statusMessages').innerHTML = messagesHtml;
+    }
+}
+
+function checkStatus() {
+    fetch('/api/job_status/{{ job_id }}')
+        .then(response => response.json())
+        .then(data => {
+            // Progress bar güncelleme
+            const progress = Math.min(data.progress || 0, 100);
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressBar').setAttribute('aria-valuenow', progress);
+
+            // Sayfa bilgisi güncelleme
+            if (data.page && data.total_pages) {
+                document.getElementById('currentPage').textContent = 
+                    `${data.page} / ${data.total_pages}`;
+            }
+
+            // Bulunan iş sayısı güncelleme
+            if (data.found_jobs) {
+                document.getElementById('foundJobs').textContent = data.found_jobs;
+            }
+
+            // Durum mesajı güncelleme
+            if (data.message) {
+                updateStatusMessages(data.message);
+            }
+
+            // Durum kontrolü
+            if (data.status === 'completed') {
+                document.getElementById('statusText').innerHTML = 
+                    '<i class="fas fa-check-circle text-success me-2"></i>Arama tamamlandı!';
+                document.getElementById('progressBar').classList.remove('progress-bar-animated');
+                document.getElementById('resultButtons').style.display = 'block';
+                return;
+            } else if (data.status === 'error') {
+                document.getElementById('statusText').innerHTML = 
+                    '<i class="fas fa-exclamation-circle text-danger me-2"></i>Hata oluştu!';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorText').textContent = data.message || 'Bilinmeyen bir hata oluştu.';
+                return;
+            }
+
+            // Devam eden işlem için tekrar kontrol
+            setTimeout(checkStatus, 1000);
+            updateElapsedTime();
+        })
+        .catch(error => {
+            console.error('Status check error:', error);
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('errorText').textContent = 'Sunucu ile bağlantı kurulamadı.';
+        });
+}
+
+// Sayfa yüklendiğinde başlat
+document.addEventListener('DOMContentLoaded', function() {
+    checkStatus();
+    setInterval(updateElapsedTime, 1000);
+});
 </script>
 {% endblock %}
