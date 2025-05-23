@@ -26,81 +26,171 @@
         background-color: #dc3545;
     }
     
-    .job-result {
-        max-height: 400px;
-        overflow-y: auto;
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
+    
+    .metric-card {
+        transition: transform 0.2s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .status-message {
+        padding: 0.5rem 0;
+        border-left: 3px solid #0077b5;
+        padding-left: 1rem;
+        margin-bottom: 0.5rem;
+        background: rgba(0, 119, 181, 0.05);
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .progress-text {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        line-height: 10px;
+        color: white;
+        font-weight: bold;
+        font-size: 0.75rem;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+    }
+    
+    .live-counter {
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-10">
         <div class="card">
             <div class="card-body">
                 <div id="statusContainer">
-                    <!-- Arama Durumu -->
+                    <!-- Arama Durumu Başlık -->
                     <div class="text-center mb-4">
                         <div class="status-icon mb-3">
-                            <i class="fas fa-search fa-3x text-primary"></i>
+                            <i class="fas fa-search fa-3x text-primary" id="statusIcon"></i>
                         </div>
-                        <h2 class="card-title mb-3">Arama Durumu</h2>
+                        <h2 class="card-title mb-3">LinkedIn İş Arama Durumu</h2>
                         <p class="lead mb-0" id="statusText">İş ilanları aranıyor...</p>
+                        <small class="text-muted d-block mt-2" id="statusSubtext">Lütfen bekleyin, bu işlem birkaç dakika sürebilir</small>
                     </div>
 
                     <!-- İlerleme Çubuğu -->
-                    <div class="progress mb-4" style="height: 10px;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                             role="progressbar" 
-                             id="progressBar"
-                             style="width: 0%;"
-                             aria-valuenow="0" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">İlerleme</span>
+                            <span class="badge bg-primary" id="progressPercent">0%</span>
+                        </div>
+                        <div class="progress position-relative" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                 role="progressbar" 
+                                 id="progressBar"
+                                 style="width: 0%;"
+                                 aria-valuenow="0" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                            <div class="progress-text" id="progressText">0%</div>
                         </div>
                     </div>
 
-                    <!-- Detaylı Bilgiler -->
-                    <div class="row text-center mb-4">
-                        <div class="col-md-4">
-                            <div class="card border-0 bg-light">
-                                <div class="card-body">
-                                    <i class="fas fa-clock text-primary mb-2"></i>
-                                    <h5 class="card-title">Geçen Süre</h5>
-                                    <p class="card-text" id="elapsedTime">0:00</p>
+                    <!-- Detaylı Metrikler -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card border-0 bg-light metric-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-clock text-primary fa-2x mb-2"></i>
+                                    <h5 class="card-title">Süre</h5>
+                                    <p class="card-text live-counter" id="elapsedTime">0:00</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card border-0 bg-light">
-                                <div class="card-body">
-                                    <i class="fas fa-file-alt text-primary mb-2"></i>
-                                    <h5 class="card-title">Taranan Sayfa</h5>
-                                    <p class="card-text" id="currentPage">0 / 0</p>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card border-0 bg-light metric-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-file-alt text-info fa-2x mb-2"></i>
+                                    <h5 class="card-title">Sayfa</h5>
+                                    <p class="card-text live-counter" id="currentPage">0 / 0</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card border-0 bg-light">
-                                <div class="card-body">
-                                    <i class="fas fa-briefcase text-primary mb-2"></i>
-                                    <h5 class="card-title">Bulunan İlanlar</h5>
-                                    <p class="card-text" id="foundJobs">0</p>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card border-0 bg-light metric-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-briefcase text-success fa-2x mb-2"></i>
+                                    <h5 class="card-title">Bulunan</h5>
+                                    <p class="card-text live-counter" id="foundJobs">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card border-0 bg-light metric-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tachometer-alt text-warning fa-2x mb-2"></i>
+                                    <h5 class="card-title">Hız</h5>
+                                    <p class="card-text live-counter" id="scrapingSpeed">0 ilan/dk</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Durum Mesajları -->
+                    <!-- Arama Kriterleri -->
                     <div class="card bg-light mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="fas fa-info-circle me-2"></i>Son Durum
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-search me-2"></i>Arama Kriterleri
                             </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Anahtar Kelimeler:</strong> {{ job.params.keywords }}<br>
+                                    {% if job.params.location %}
+                                    <strong>Lokasyon:</strong> {{ job.params.location }}<br>
+                                    {% endif %}
+                                    <strong>Sayfa Sayısı:</strong> {{ job.params.max_pages }}
+                                </div>
+                                <div class="col-md-6">
+                                    {% if job.params.job_types %}
+                                    <strong>İş Türleri:</strong> 
+                                    {% for type in job.params.job_types %}
+                                        <span class="badge bg-secondary me-1">
+                                            {% if type == 'F' %}Tam Zamanlı
+                                            {% elif type == 'P' %}Yarı Zamanlı  
+                                            {% elif type == 'C' %}Sözleşmeli
+                                            {% elif type == 'T' %}Geçici
+                                            {% elif type == 'I' %}Staj
+                                            {% endif %}
+                                        </span>
+                                    {% endfor %}<br>
+                                    {% endif %}
+                                    <strong>Başlatma:</strong> {{ job.created_at }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Canlı Durum Mesajları -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Canlı Durum
+                            </h5>
+                            <small class="text-muted">Son güncelleme: <span id="lastUpdate">-</span></small>
+                        </div>
+                        <div class="card-body">
                             <div class="status-messages" id="statusMessages">
                                 <div class="placeholder-glow">
                                     <span class="placeholder col-12"></span>
-                                    <span class="placeholder col-12"></span>
+                                    <span class="placeholder col-8"></span>
                                 </div>
                             </div>
                         </div>
@@ -108,24 +198,50 @@
 
                     <!-- Sonuç Butonları -->
                     <div class="text-center" id="resultButtons" style="display: none;">
-                        <div class="btn-group">
-                            <a href="{{ url_for('download_results', job_id=job_id) }}" class="btn btn-success">
-                                <i class="fas fa-download me-2"></i>Sonuçları İndir
-                            </a>
-                            <a href="{{ url_for('index') }}" class="btn btn-primary">
-                                <i class="fas fa-search me-2"></i>Yeni Arama
-                            </a>
+                        <div class="alert alert-success">
+                            <h4 class="alert-heading">
+                                <i class="fas fa-check-circle me-2"></i>Arama Tamamlandı!
+                            </h4>
+                            <p class="mb-3">İş ilanları başarıyla toplandı ve CSV dosyasına kaydedildi.</p>
+                            <div class="btn-group">
+                                <a href="{{ url_for('download_results', job_id=job_id) }}" class="btn btn-success btn-lg">
+                                    <i class="fas fa-download me-2"></i>Sonuçları İndir (CSV)
+                                </a>
+                                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-search me-2"></i>Yeni Arama
+                                </a>
+                                <a href="{{ url_for('jobs_list') }}" class="btn btn-outline-primary btn-lg">
+                                    <i class="fas fa-list me-2"></i>Tüm Aramalar
+                                </a>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Hata Mesajı -->
                     <div class="alert alert-danger" id="errorMessage" style="display: none;">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <span id="errorText"></span>
-                        <div class="mt-3">
-                            <a href="{{ url_for('index') }}" class="btn btn-outline-danger">
-                                <i class="fas fa-redo me-2"></i>Yeniden Dene
-                            </a>
+                        <h4 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Hata Oluştu
+                        </h4>
+                        <p id="errorText"></p>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Olası Çözümler:</h6>
+                                <ul class="small">
+                                    <li>İnternet bağlantınızı kontrol edin</li>
+                                    <li>Arama kriterlerini basitleştirin</li>
+                                    <li>Sayfa sayısını azaltın</li>
+                                    <li>Birkaç dakika bekleyip tekrar deneyin</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a href="{{ url_for('index') }}" class="btn btn-outline-danger">
+                                    <i class="fas fa-redo me-2"></i>Yeniden Dene
+                                </a>
+                                <a href="{{ url_for('jobs_list') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-list me-2"></i>Önceki Aramalar
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,6 +255,8 @@
 <script>
 let startTime = new Date();
 let statusMessages = [];
+let lastJobCount = 0;
+let lastUpdateTime = new Date();
 
 function updateElapsedTime() {
     const now = new Date();
@@ -147,6 +265,26 @@ function updateElapsedTime() {
     const seconds = elapsed % 60;
     document.getElementById('elapsedTime').textContent = 
         `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function updateLastUpdateTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('tr-TR');
+    document.getElementById('lastUpdate').textContent = timeStr;
+}
+
+function calculateSpeed(currentJobs) {
+    const now = new Date();
+    const timeDiff = (now - lastUpdateTime) / 1000 / 60; // dakika cinsinden
+    const jobDiff = currentJobs - lastJobCount;
+    
+    if (timeDiff > 0 && jobDiff > 0) {
+        const speed = Math.round(jobDiff / timeDiff);
+        document.getElementById('scrapingSpeed').textContent = `${speed} ilan/dk`;
+    }
+    
+    lastJobCount = currentJobs;
+    lastUpdateTime = now;
 }
 
 function updateStatusMessages(message) {
@@ -165,14 +303,45 @@ function updateStatusMessages(message) {
     }
 }
 
+function updateProgressBar(progress) {
+    progress = Math.min(Math.max(progress, 0), 100);
+    
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressPercent = document.getElementById('progressPercent');
+    
+    progressBar.style.width = `${progress}%`;
+    progressBar.setAttribute('aria-valuenow', progress);
+    progressText.textContent = `${Math.round(progress)}%`;
+    progressPercent.textContent = `${Math.round(progress)}%`;
+}
+
+function updateStatusIcon(status) {
+    const icon = document.getElementById('statusIcon');
+    const iconClasses = {
+        'queued': 'fas fa-clock text-secondary',
+        'running': 'fas fa-sync-alt fa-spin text-primary',
+        'completed': 'fas fa-check-circle text-success', 
+        'failed': 'fas fa-exclamation-circle text-danger'
+    };
+    
+    icon.className = iconClasses[status] || 'fas fa-search text-primary';
+}
+
 function checkStatus() {
     fetch('/api/job_status/{{ job_id }}')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             // Progress bar güncelleme
-            const progress = Math.min(data.progress || 0, 100);
-            document.getElementById('progressBar').style.width = `${progress}%`;
-            document.getElementById('progressBar').setAttribute('aria-valuenow', progress);
+            updateProgressBar(data.progress || 0);
+
+            // Status icon güncelleme
+            updateStatusIcon(data.status);
 
             // Sayfa bilgisi güncelleme
             if (data.page && data.total_pages) {
@@ -181,38 +350,59 @@ function checkStatus() {
             }
 
             // Bulunan iş sayısı güncelleme
-            if (data.found_jobs) {
-                document.getElementById('foundJobs').textContent = data.found_jobs;
-            }
+            const foundJobs = data.found_jobs || 0;
+            document.getElementById('foundJobs').textContent = foundJobs;
+            
+            // Hız hesaplama
+            calculateSpeed(foundJobs);
 
             // Durum mesajı güncelleme
             if (data.message) {
                 updateStatusMessages(data.message);
+                updateLastUpdateTime();
             }
+
+            // Ana durum metni güncelleme
+            const statusTexts = {
+                'queued': 'Arama sıraya alındı...',
+                'running': 'İş ilanları aranıyor...',
+                'completed': 'Arama başarıyla tamamlandı!',
+                'failed': 'Arama sırasında hata oluştu'
+            };
+            
+            const statusSubtexts = {
+                'queued': 'İşlem yakında başlayacak',
+                'running': `${foundJobs} ilan bulundu, devam ediyor...`,
+                'completed': `Toplam ${foundJobs} ilan bulundu ve kaydedildi`,
+                'failed': 'Lütfen tekrar deneyin veya destek alın'
+            };
+
+            document.getElementById('statusText').textContent = 
+                statusTexts[data.status] || 'İşlem devam ediyor...';
+            document.getElementById('statusSubtext').textContent = 
+                statusSubtexts[data.status] || '';
 
             // Durum kontrolü
             if (data.status === 'completed') {
-                document.getElementById('statusText').innerHTML = 
-                    '<i class="fas fa-check-circle text-success me-2"></i>Arama tamamlandı!';
                 document.getElementById('progressBar').classList.remove('progress-bar-animated');
                 document.getElementById('resultButtons').style.display = 'block';
-                return;
-            } else if (data.status === 'error') {
-                document.getElementById('statusText').innerHTML = 
-                    '<i class="fas fa-exclamation-circle text-danger me-2"></i>Hata oluştu!';
+                return; // Polling'i durdur
+            } else if (data.status === 'failed') {
                 document.getElementById('errorMessage').style.display = 'block';
-                document.getElementById('errorText').textContent = data.message || 'Bilinmeyen bir hata oluştu.';
-                return;
+                document.getElementById('errorText').textContent = 
+                    data.error || data.message || 'Bilinmeyen bir hata oluştu.';
+                return; // Polling'i durdur
             }
 
             // Devam eden işlem için tekrar kontrol
-            setTimeout(checkStatus, 1000);
+            setTimeout(checkStatus, 2000);
             updateElapsedTime();
         })
         .catch(error => {
             console.error('Status check error:', error);
             document.getElementById('errorMessage').style.display = 'block';
-            document.getElementById('errorText').textContent = 'Sunucu ile bağlantı kurulamadı.';
+            document.getElementById('errorText').textContent = 
+                'Sunucu ile bağlantı kurulamadı. Sayfa yenilemeyi deneyin.';
         });
 }
 
@@ -220,6 +410,19 @@ function checkStatus() {
 document.addEventListener('DOMContentLoaded', function() {
     checkStatus();
     setInterval(updateElapsedTime, 1000);
+    updateLastUpdateTime();
+});
+
+// Sayfa görünürlük değiştiğinde polling hızını ayarla
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        // Sayfa gizliyken daha az sıklıkta kontrol et
+        clearTimeout(checkStatus);
+        setTimeout(checkStatus, 10000);
+    } else {
+        // Sayfa görünürken normal hızda kontrol et  
+        checkStatus();
+    }
 });
 </script>
 {% endblock %}

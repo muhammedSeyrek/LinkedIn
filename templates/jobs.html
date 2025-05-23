@@ -2,197 +2,563 @@
 
 {% block title %}Aramalarım{% endblock %}
 
+{% block extra_css %}
+<style>
+    .job-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+    
+    .job-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-color: #0077b5;
+    }
+    
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .job-details {
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .job-meta {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .filter-tabs {
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 2rem;
+    }
+    
+    .filter-tab {
+        padding: 0.75rem 1.5rem;
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-bottom: 3px solid transparent;
+    }
+    
+    .filter-tab.active,
+    .filter-tab:hover {
+        color: #0077b5;
+        border-bottom-color: #0077b5;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 0;
+        color: #6c757d;
+    }
+    
+    .search-box {
+        position: relative;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+    
+    .search-input {
+        padding-left: 2.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-10">
-        <!-- Intro Card -->
-        <div class="card mb-4">
-            <div class="card-body text-center py-4">
-                <h1 class="card-title mb-3">Aramalarım</h1>
-                <p class="lead mb-4">Önceki aramalarınızı görüntüleyin ve sonuçları indirin.</p>
-                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-search me-2"></i>Yeni Arama Başlat
+    <div class="col-md-11">
+        <!-- Başlık ve Arama -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-1">
+                    <i class="fas fa-briefcase text-primary me-2"></i>
+                    Aramalarım
+                </h1>
+                <p class="text-muted mb-0">LinkedIn iş araması geçmişiniz ve sonuçları</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Yeni Arama
                 </a>
             </div>
         </div>
 
-        <!-- Jobs List -->
         {% if jobs %}
-        <div class="card">
+        <!-- Filtreleme ve Arama -->
+        <div class="card mb-4">
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th>Arama Detayları</th>
-                                <th>Durum</th>
-                                <th>Sonuçlar</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for job in jobs %}
-                            <tr>
-                                <!-- Arama Detayları -->
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="job-icon me-3">
-                                            <i class="fas fa-briefcase fa-2x text-primary"></i>
-                                        </div>
-                                        <div>
-                                            <h5 class="mb-1">{{ job.params.keywords }}</h5>
-                                            <div class="small text-muted">
-                                                {% if job.params.location %}
-                                                <i class="fas fa-map-marker-alt me-1"></i>{{ job.params.location }}
-                                                {% endif %}
-                                                <span class="mx-2">•</span>
-                                                <i class="far fa-clock me-1"></i>{{ job.created_at }}
-                                            </div>
-                                            <div class="mt-2">
-                                                {% if job.params.job_types %}
-                                                    {% for type in job.params.job_types %}
-                                                        <span class="badge bg-light text-dark me-1">
-                                                            {% if type == 'F' %}Tam Zamanlı
-                                                            {% elif type == 'P' %}Yarı Zamanlı
-                                                            {% elif type == 'C' %}Sözleşmeli
-                                                            {% elif type == 'T' %}Geçici
-                                                            {% elif type == 'I' %}Staj
-                                                            {% endif %}
-                                                        </span>
-                                                    {% endfor %}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control search-input" 
+                                   id="searchInput" placeholder="Aramalarınızda arayın...">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="filter-tabs d-flex justify-content-end">
+                            <button class="filter-tab active" data-filter="all">
+                                Tümü ({{ jobs|length }})
+                            </button>
+                            <button class="filter-tab" data-filter="completed">
+                                Tamamlanan
+                            </button>
+                            <button class="filter-tab" data-filter="running">
+                                Devam Eden
+                            </button>
+                            <button class="filter-tab" data-filter="failed">
+                                Başarısız
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- İş Listesi -->
+        <div id="jobsList">
+            {% for job in jobs %}
+            <div class="job-card card mb-3" 
+                 data-status="{{ job.status }}" 
+                 data-keywords="{{ job.params.keywords|lower }}"
+                 data-location="{{ job.params.location|lower if job.params.location else '' }}">
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Sol Taraf: Arama Detayları -->
+                        <div class="col-md-6">
+                            <div class="job-details">
+                                <h5 class="card-title mb-2">
+                                    <i class="fas fa-search text-primary me-2"></i>
+                                    {{ job.params.keywords }}
+                                </h5>
+                                
+                                <div class="job-meta mb-2">
+                                    {% if job.params.location %}
+                                    <span class="me-3">
+                                        <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                        {{ job.params.location }}
+                                    </span>
+                                    {% endif %}
+                                    <span class="me-3">
+                                        <i class="far fa-calendar text-muted me-1"></i>
+                                        {{ job.created_at }}
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-file-alt text-muted me-1"></i>
+                                        {{ job.params.max_pages }} sayfa
+                                    </span>
+                                </div>
+
+                                <!-- Filtreler -->
+                                {% if job.params.job_types or job.params.experience_levels or job.params.remote_options %}
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    {% if job.params.job_types %}
+                                        {% for type in job.params.job_types %}
+                                            <span class="badge bg-light text-dark">
+                                                {% if type == 'F' %}<i class="fas fa-business-time me-1"></i>Tam Zamanlı
+                                                {% elif type == 'P' %}<i class="fas fa-clock me-1"></i>Yarı Zamanlı
+                                                {% elif type == 'C' %}<i class="fas fa-file-contract me-1"></i>Sözleşmeli
+                                                {% elif type == 'T' %}<i class="fas fa-hourglass-half me-1"></i>Geçici
+                                                {% elif type == 'I' %}<i class="fas fa-graduation-cap me-1"></i>Staj
+                                                {% endif %}
+                                            </span>
+                                        {% endfor %}
+                                    {% endif %}
+                                    
+                                    {% if job.params.remote_options %}
+                                        {% for option in job.params.remote_options %}
+                                            <span class="badge bg-info">
+                                                {% if option == '1' %}<i class="fas fa-home me-1"></i>Uzaktan
+                                                {% elif option == '2' %}<i class="fas fa-building-user me-1"></i>Hibrit
+                                                {% elif option == '3' %}<i class="fas fa-building me-1"></i>Ofiste
+                                                {% endif %}
+                                            </span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Sağ Taraf: Durum ve İşlemler -->
+                        <div class="col-md-6">
+                            <div class="d-flex flex-column h-100">
                                 <!-- Durum -->
-                                <td>
+                                <div class="mb-3">
                                     {% if job.status == 'completed' %}
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check me-1"></i>Tamamlandı
+                                        <span class="badge bg-success status-badge">
+                                            <i class="fas fa-check-circle me-1"></i>Tamamlandı
                                         </span>
                                         {% if job.found_jobs %}
-                                        <div class="small text-muted mt-1">
-                                            {{ job.found_jobs }} ilan bulundu
+                                        <div class="mt-2">
+                                            <strong class="text-success">{{ job.found_jobs }} ilan bulundu</strong>
+                                            {% if job.completed_at %}
+                                            <br><small class="text-muted">{{ job.completed_at }}</small>
+                                            {% endif %}
                                         </div>
                                         {% endif %}
                                     {% elif job.status == 'running' %}
-                                        <span class="badge bg-primary">
+                                        <span class="badge bg-primary status-badge">
                                             <i class="fas fa-sync-alt fa-spin me-1"></i>Devam Ediyor
                                         </span>
-                                        <div class="small text-muted mt-1">
-                                            %{{ job.progress }} tamamlandı
+                                        <div class="mt-2">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-primary" 
+                                                     style="width: {{ job.progress|default(0) }}%"></div>
+                                            </div>
+                                            <small class="text-muted">
+                                                %{{ job.progress|default(0)|round }} tamamlandı
+                                                {% if job.found_jobs %} • {{ job.found_jobs }} ilan bulundu{% endif %}
+                                            </small>
                                         </div>
                                     {% elif job.status == 'failed' %}
-                                        <span class="badge bg-danger">
+                                        <span class="badge bg-danger status-badge">
                                             <i class="fas fa-exclamation-circle me-1"></i>Başarısız
                                         </span>
+                                        {% if job.error %}
+                                        <div class="mt-2">
+                                            <small class="text-danger">{{ job.error[:100] }}{% if job.error|length > 100 %}...{% endif %}</small>
+                                        </div>
+                                        {% endif %}
                                     {% else %}
-                                        <span class="badge bg-secondary">
+                                        <span class="badge bg-secondary status-badge">
                                             <i class="fas fa-clock me-1"></i>Bekliyor
                                         </span>
                                     {% endif %}
-                                </td>
-
-                                <!-- Sonuçlar -->
-                                <td>
-                                    {% if job.status == 'completed' and job.result_file %}
-                                        <a href="{{ url_for('download_results', job_id=job.id) }}" 
-                                           class="btn btn-success btn-sm">
-                                            <i class="fas fa-download me-1"></i>İndir
-                                        </a>
-                                    {% elif job.status == 'running' %}
-                                        <a href="{{ url_for('job_status', job_id=job.id) }}" 
-                                           class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>İlerleyişi Gör
-                                        </a>
-                                    {% elif job.status == 'failed' %}
-                                        <button class="btn btn-outline-danger btn-sm" 
-                                                data-bs-toggle="tooltip" 
-                                                title="{{ job.error }}">
-                                            <i class="fas fa-exclamation-triangle me-1"></i>Hata Detayı
-                                        </button>
-                                    {% else %}
-                                        <span class="text-muted">-</span>
-                                    {% endif %}
-                                </td>
+                                </div>
 
                                 <!-- İşlemler -->
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="{{ url_for('job_status', job_id=job.id) }}" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-info-circle me-1"></i>Detaylar
-                                        </a>
+                                <div class="mt-auto">
+                                    <div class="btn-group w-100">
+                                        {% if job.status == 'completed' and job.result_file %}
+                                            <a href="{{ url_for('download_results', job_id=job.id) }}" 
+                                               class="btn btn-success flex-fill">
+                                                <i class="fas fa-download me-1"></i>İndir
+                                            </a>
+                                        {% endif %}
+                                        
+                                        {% if job.status == 'running' %}
+                                            <a href="{{ url_for('job_status', job_id=job.id) }}" 
+                                               class="btn btn-primary flex-fill">
+                                                <i class="fas fa-eye me-1"></i>Canlı İzle
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ url_for('job_status', job_id=job.id) }}" 
+                                               class="btn btn-outline-primary flex-fill">
+                                                <i class="fas fa-info-circle me-1"></i>Detaylar
+                                            </a>
+                                        {% endif %}
+                                        
                                         {% if job.status == 'completed' %}
-                                        <button class="btn btn-outline-success btn-sm" 
-                                                onclick="duplicateSearch('{{ job.params.keywords }}', '{{ job.params.location }}')">
-                                            <i class="fas fa-copy me-1"></i>Tekrarla
-                                        </button>
+                                            <button class="btn btn-outline-success flex-fill" 
+                                                    onclick="duplicateSearch('{{ job.params.keywords }}', '{{ job.params.location or '' }}', '{{ job.params|tojson|e }}')">
+                                                <i class="fas fa-copy me-1"></i>Tekrarla
+                                            </button>
                                         {% endif %}
                                     </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
+
+        <!-- Bulunamadı Mesajı -->
+        <div id="noResults" class="empty-state" style="display: none;">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>Arama sonucu bulunamadı</h4>
+            <p class="text-muted">Arama kriterlerinizi değiştirip tekrar deneyin.</p>
+        </div>
+
         {% else %}
-        <!-- No Jobs Message -->
+        <!-- Hiç İş Yok Mesajı -->
         <div class="card">
             <div class="card-body text-center py-5">
-                <div class="mb-4">
-                    <i class="fas fa-search fa-4x text-muted"></i>
+                <div class="empty-state">
+                    <i class="fas fa-briefcase fa-4x text-muted mb-4"></i>
+                    <h3>Henüz Bir Arama Yapmadınız</h3>
+                    <p class="text-muted mb-4">LinkedIn'deki iş ilanlarını aramak için yeni bir arama başlatın.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>İlk Aramayı Başlat
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#helpModal">
+                            <i class="fas fa-question-circle me-2"></i>Nasıl Kullanılır?
+                        </a>
+                    </div>
                 </div>
-                <h3>Henüz Bir Arama Yapmadınız</h3>
-                <p class="text-muted mb-4">LinkedIn'deki iş ilanlarını aramak için yeni bir arama başlatın.</p>
-                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-search me-2"></i>İlk Aramayı Başlat
-                </a>
             </div>
         </div>
         {% endif %}
+    </div>
+</div>
+
+<!-- Yardım Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-question-circle text-primary me-2"></i>
+                    Nasıl Kullanılır?
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-search text-primary me-2"></i>Arama Yapma</h6>
+                        <ul class="small">
+                            <li>Anahtar kelimeler girin (zorunlu)</li>
+                            <li>Lokasyon belirtin (opsiyonel)</li>
+                            <li>Filtreleri ayarlayın</li>
+                            <li>Sayfa sayısını seçin</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-download text-success me-2"></i>Sonuçları İndirme</h6>
+                        <ul class="small">
+                            <li>Arama tamamlandığında "İndir" düğmesi görünür</li>
+                            <li>CSV formatında dosya indirilir</li>
+                            <li>Excel'de açılabilir</li>
+                        </ul>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-eye text-info me-2"></i>İlerleme İzleme</h6>
+                        <ul class="small">
+                            <li>Canlı durum sayfasında takip edin</li>
+                            <li>Bulunan ilan sayısını görün</li>
+                            <li>İlerleme yüzdesini izleyin</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-copy text-warning me-2"></i>Aramayı Tekrarlama</h6>
+                        <ul class="small">
+                            <li>"Tekrarla" düğmesine tıklayın</li>
+                            <li>Aynı kriterlerle yeni arama başlar</li>
+                            <li>Parametreleri değiştirebilirsiniz</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">Aramaya Başla</a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Tooltip'leri etkinleştir
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-});
+// Filtreleme fonksiyonu
+function filterJobs(status) {
+    const jobs = document.querySelectorAll('.job-card');
+    const tabs = document.querySelectorAll('.filter-tab');
+    let visibleCount = 0;
 
-// Aramayı tekrarla
-function duplicateSearch(keywords, location) {
-    // Form oluştur
-    var form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '{{ url_for("start_search") }}';
+    // Tab'ları güncelle
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.filter === status) {
+            tab.classList.add('active');
+        }
+    });
 
-    // Keywords input
-    var keywordsInput = document.createElement('input');
-    keywordsInput.type = 'hidden';
-    keywordsInput.name = 'keywords';
-    keywordsInput.value = keywords;
-    form.appendChild(keywordsInput);
+    // İşleri filtrele
+    jobs.forEach(job => {
+        const jobStatus = job.dataset.status;
+        if (status === 'all' || jobStatus === status) {
+            job.style.display = 'block';
+            visibleCount++;
+        } else {
+            job.style.display = 'none';
+        }
+    });
 
-    // Location input
-    if (location) {
-        var locationInput = document.createElement('input');
-        locationInput.type = 'hidden';
-        locationInput.name = 'location';
-        locationInput.value = location;
-        form.appendChild(locationInput);
+    // Sonuç mesajını göster/gizle
+    const noResults = document.getElementById('noResults');
+    if (visibleCount === 0) {
+        noResults.style.display = 'block';
+    } else {
+        noResults.style.display = 'none';
+    }
+}
+
+// Arama fonksiyonu
+function searchJobs(query) {
+    const jobs = document.querySelectorAll('.job-card');
+    const searchTerm = query.toLowerCase();
+    let visibleCount = 0;
+
+    jobs.forEach(job => {
+        const keywords = job.dataset.keywords;
+        const location = job.dataset.location;
+        const isVisible = keywords.includes(searchTerm) || location.includes(searchTerm);
+        
+        if (isVisible) {
+            job.style.display = 'block';
+            visibleCount++;
+        } else {
+            job.style.display = 'none';
+        }
+    });
+
+    // Sonuç mesajını göster/gizle
+    const noResults = document.getElementById('noResults');
+    if (visibleCount === 0 && searchTerm !== '') {
+        noResults.style.display = 'block';
+    } else {
+        noResults.style.display = 'none';
+    }
+}
+
+// Aramayı tekrarla fonksiyonu
+function duplicateSearch(keywords, location, allParams) {
+    try {
+        const params = JSON.parse(allParams);
+        
+        // Form oluştur
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("start_search") }}';
+
+        // Tüm parametreleri ekle
+        Object.keys(params).forEach(key => {
+            const value = params[key];
+            
+            if (Array.isArray(value)) {
+                // Array değerler için multiple input
+                value.forEach(item => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = item;
+                    form.appendChild(input);
+                });
+            } else if (value !== null && value !== undefined && value !== '') {
+                // Tekil değerler için single input
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+        });
+
+        // Formu sayfaya ekle ve gönder
+        document.body.appendChild(form);
+        form.submit();
+    } catch (e) {
+        console.error('Arama tekrarlama hatası:', e);
+        // Fallback: sadece keywords ve location ile
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("start_search") }}';
+
+        const keywordsInput = document.createElement('input');
+        keywordsInput.type = 'hidden';
+        keywordsInput.name = 'keywords';
+        keywordsInput.value = keywords;
+        form.appendChild(keywordsInput);
+
+        if (location) {
+            const locationInput = document.createElement('input');
+            locationInput.type = 'hidden';
+            locationInput.name = 'location';
+            locationInput.value = location;
+            form.appendChild(locationInput);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Event listener'ları ekle
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtre tab'ları
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            filterJobs(filter);
+        });
+    });
+
+    // Arama kutusu
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchJobs(this.value);
+            }, 300);
+        });
     }
 
-    // Formu sayfaya ekle ve gönder
-    document.body.appendChild(form);
-    form.submit();
-}
+    // Tooltip'leri etkinleştir
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Devam eden işleri otomatik güncelle
+    function updateRunningJobs() {
+        const runningJobs = document.querySelectorAll('[data-status="running"]');
+        
+        runningJobs.forEach(jobCard => {
+            const jobId = jobCard.querySelector('a[href*="job_status"]').href.split('/').pop();
+            
+            fetch(`/api/job_status/${jobId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status !== 'running') {
+                        // Sayfa yenilenmesi gerekiyor, durum değişti
+                        location.reload();
+                    } else {
+                        // Progress bar'ı güncelle
+                        const progressBar = jobCard.querySelector('.progress-bar');
+                        const progressText = jobCard.querySelector('.text-muted');
+                        
+                        if (progressBar && data.progress) {
+                            progressBar.style.width = `${data.progress}%`;
+                        }
+                        
+                        if (progressText && data.found_jobs) {
+                            progressText.innerHTML = `%${Math.round(data.progress || 0)} tamamlandı • ${data.found_jobs} ilan bulundu`;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Job status update error:', error);
+                });
+        });
+    }
+
+    // Her 5 saniyede bir devam eden işleri kontrol et
+    if (document.querySelectorAll('[data-status="running"]').length > 0) {
+        setInterval(updateRunningJobs, 5000);
+    }
+});
 </script>
 {% endblock %}
