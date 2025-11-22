@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Sunucu Hatası - 500{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-server fa-5x text-danger"></i>
+                </div>
+                <h1 class="display-1 text-danger">500</h1>
+                <h2 class="mb-4">Sunucu Hatası</h2>
+                <p class="lead text-muted mb-4">
+                    Üzgünüz, sunucuda bir hata oluştu. Lütfen daha sonra tekrar deneyin.
+                </p>
+
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Hata:</strong> İsteğiniz işlenirken bir sorun oluştu. Teknik ekibimiz bilgilendirildi.
+                </div>
+
+                <!-- Sorun Giderme İpuçları -->
+                <div class="card bg-light mb-4">
+                    <div class="card-body text-start">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-tools text-primary me-2"></i>
+                            Sorun Giderme İpuçları
+                        </h5>
+                        <ul class="mb-0">
+                            <li class="mb-2">Sayfayı yenilemeyi deneyin (F5 veya Ctrl+R)</li>
+                            <li class="mb-2">Tarayıcı önbelleğini temizleyin</li>
+                            <li class="mb-2">Birkaç dakika bekleyip tekrar deneyin</li>
+                            <li class="mb-2">Sorun devam ederse sistem yöneticisi ile iletişime geçin</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button onclick="location.reload()" class="btn btn-danger btn-lg">
+                        <i class="fas fa-sync-alt me-2"></i>Sayfayı Yenile
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
+                    </a>
+                    <button onclick="history.back()" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hata Detayları -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="fas fa-info-circle text-danger me-2"></i>
+                    Hata Raporu
+                </h5>
+                <div class="alert alert-warning">
+                    <strong>Hata Kodu:</strong> 500 - Internal Server Error
+                    <br>
+                    <strong>Zaman:</strong> <span id="errorTime"></span>
+                    <br>
+                    <strong>Tarayıcı:</strong> <span id="browserInfo"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Yaygın Nedenler:</h6>
+                        <ul class="small">
+                            <li>Sunucu yapılandırma hatası</li>
+                            <li>Veritabanı bağlantı sorunu</li>
+                            <li>Uygulama kodu hatası</li>
+                            <li>Kaynak yetersizliği</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>İletişim:</h6>
+                        <p class="small mb-2">
+                            <i class="fas fa-envelope text-primary me-2"></i>
+                            <a href="mailto:muhammedseyrek00@gmail.com">muhammedseyrek00@gmail.com</a>
+                        </p>
+                        <p class="small mb-0">
+                            <i class="fab fa-github text-primary me-2"></i>
+                            <a href="https://github.com/muhammedSeyrek/LinkedIn" target="_blank">GitHub Issues</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Hata zamanını göster
+    const now = new Date();
+    document.getElementById('errorTime').textContent = now.toLocaleString('tr-TR');
+
+    // Tarayıcı bilgisini göster
+    document.getElementById('browserInfo').textContent = navigator.userAgent.split(')')[0].split('(')[1];
+});
+</script>
+{% endblock %}
