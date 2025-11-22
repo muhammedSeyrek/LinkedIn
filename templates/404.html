@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Sayfa Bulunamadı - 404{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-exclamation-triangle fa-5x text-warning"></i>
+                </div>
+                <h1 class="display-1 text-primary">404</h1>
+                <h2 class="mb-4">Sayfa Bulunamadı</h2>
+                <p class="lead text-muted mb-4">
+                    Üzgünüz, aradığınız sayfa mevcut değil veya taşınmış olabilir.
+                </p>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>İpucu:</strong> URL'yi kontrol edin veya ana sayfaya dönüp yeniden deneyin.
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
+                    </a>
+                    <a href="{{ url_for('jobs_list') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-list me-2"></i>Aramalarım
+                    </a>
+                    <button onclick="history.back()" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yardımcı Linkler -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="fas fa-question-circle text-primary me-2"></i>
+                    Size Yardımcı Olabilecek Linkler
+                </h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <a href="{{ url_for('index') }}" class="text-decoration-none">
+                                    <i class="fas fa-search text-primary me-2"></i>Yeni Arama Yap
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ url_for('jobs_list') }}" class="text-decoration-none">
+                                    <i class="fas fa-list text-primary me-2"></i>Arama Geçmişi
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <a href="{{ url_for('api_stats') }}" class="text-decoration-none">
+                                    <i class="fas fa-chart-bar text-primary me-2"></i>Sistem İstatistikleri
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="mailto:muhammedseyrek00@gmail.com" class="text-decoration-none">
+                                    <i class="fas fa-envelope text-primary me-2"></i>Destek
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
