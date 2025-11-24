@@ -14,7 +14,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
-from webdriver_manager.chrome import ChromeDriverManager
 
 # Local imports
 from config import Config
@@ -80,8 +79,11 @@ class EnhancedLinkedInJobScraper:
         chrome_options.add_argument("--max_old_space_size=4096")
         
         try:
+            # ChromeDriver path - Cloud Run'da /usr/local/bin/chromedriver, local'de PATH'ten al
+            chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', 'chromedriver')
+
             self.driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()), 
+                service=Service(chromedriver_path),
                 options=chrome_options
             )
             self.wait = WebDriverWait(self.driver, Config.SELENIUM_TIMEOUT)
