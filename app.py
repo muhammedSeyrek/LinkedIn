@@ -806,10 +806,13 @@ with app.app_context():
 
 
 if __name__ == '__main__':
+    # Cloud Run için PORT environment variable'ı al
+    port = int(os.environ.get('PORT', 5000))
+
     # Geliştirme ortamında çalıştır
     app.run(
         debug=Config.DEBUG,
         host='0.0.0.0',
-        port=5000,
+        port=port,
         threaded=True
     )
