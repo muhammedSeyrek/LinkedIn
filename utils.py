@@ -198,12 +198,9 @@ def create_detailed_report(jobs_data, search_params, performance_stats):
         'performans': performance_stats
     }
 
-def log_scraping_session(job_id, search_params, results_summary, performance_stats):
+def log_scraping_session(job_id, params, meta, performance_stats):
     """Scraping oturumunu logla"""
-    logger.info(f"Session tamamlandı - Job ID: {job_id}, Sonuçlar: {results_summary}")
+    logger.info(f"Session tamamlandı - Job ID: {job_id}, Sonuçlar: {meta}, Performans: {performance_stats}")
 
 def calculate_success_metrics(*args, **kwargs):
     return {}
-
-def log_scraping_session(job_id, params, meta, performance_stats):
-    logger.info(f"Session log: {job_id}, params: {params}, meta: {meta}, perf: {performance_stats}")
