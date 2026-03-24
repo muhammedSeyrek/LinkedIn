@@ -1,19 +1,14 @@
+{{define "base"}}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkedIn İş Arama Asistanı - {% block title %}{% endblock %}</title>
-
-    <!-- Bootstrap -->
+    <title>LinkedIn İş Arama Asistanı - {{block "title" .}}{{end}}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Inter font — LinkedIn Sans'a en yakın açık kaynak font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
-        /* ── LinkedIn Design Tokens ── */
         :root {
             --li-blue:        #0a66c2;
             --li-blue-dark:   #004182;
@@ -31,465 +26,84 @@
             --li-shadow:      0 0 0 1px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.06);
             --li-shadow-hover:0 0 0 1px rgba(0,0,0,.10), 0 4px 12px rgba(0,0,0,.10);
         }
-
-        /* ── Base ── */
         *, *::before, *::after { box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-                         Helvetica Neue, Arial, sans-serif;
-            background-color: var(--li-bg);
-            color: var(--li-text);
-            font-size: 14px;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ── Navbar ── */
-        .li-navbar {
-            background: var(--li-surface);
-            border-bottom: 1px solid var(--li-border);
-            padding: 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            height: 52px;
-        }
-
-        .li-navbar .container {
-            display: flex;
-            align-items: center;
-            height: 52px;
-            gap: 8px;
-        }
-
-        .li-navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            text-decoration: none;
-            flex-shrink: 0;
-        }
-
-        .li-navbar-brand .li-logo-icon {
-            color: var(--li-blue);
-            font-size: 34px;
-            line-height: 1;
-        }
-
-        .li-navbar-brand .li-logo-text {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--li-text);
-            letter-spacing: -0.3px;
-        }
-
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica Neue, Arial, sans-serif; background-color: var(--li-bg); color: var(--li-text); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+        .li-navbar { background: var(--li-surface); border-bottom: 1px solid var(--li-border); padding: 0; position: sticky; top: 0; z-index: 1000; height: 52px; }
+        .li-navbar .container { display: flex; align-items: center; height: 52px; gap: 8px; }
+        .li-navbar-brand { display: flex; align-items: center; gap: 4px; text-decoration: none; flex-shrink: 0; }
+        .li-navbar-brand .li-logo-icon { color: var(--li-blue); font-size: 34px; line-height: 1; }
         .li-nav-spacer { flex: 1; }
-
-        .li-nav-search {
-            position: relative;
-            flex: 0 1 280px;
-        }
-
-        .li-nav-search input {
-            width: 100%;
-            background: var(--li-bg);
-            border: 1px solid var(--li-border);
-            border-radius: 4px;
-            padding: 6px 12px 6px 36px;
-            font-size: 14px;
-            font-family: inherit;
-            color: var(--li-text);
-            outline: none;
-            transition: border-color .15s, background .15s;
-        }
-
-        .li-nav-search input:focus {
-            background: var(--li-surface);
-            border-color: var(--li-blue);
-        }
-
-        .li-nav-search .li-search-icon {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--li-text-sub);
-            font-size: 13px;
-            pointer-events: none;
-        }
-
-        .li-nav-links {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .li-nav-links a {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 4px 12px;
-            color: var(--li-text-sub);
-            text-decoration: none;
-            font-size: 11px;
-            font-weight: 400;
-            border-bottom: 2px solid transparent;
-            transition: color .15s, border-color .15s;
-            white-space: nowrap;
-            height: 52px;
-            justify-content: center;
-        }
-
-        .li-nav-links a i {
-            font-size: 20px;
-            margin-bottom: 2px;
-            line-height: 1;
-        }
-
-        .li-nav-links a:hover,
-        .li-nav-links a.active {
-            color: var(--li-text);
-            border-bottom-color: var(--li-text);
-        }
-
-        /* ── Cards ── */
-        .li-card {
-            background: var(--li-surface);
-            border-radius: var(--li-radius);
-            box-shadow: var(--li-shadow);
-            border: none;
-            overflow: hidden;
-        }
-
-        .li-card-header {
-            padding: 16px 24px 0;
-            border-bottom: none;
-            background: transparent;
-        }
-
-        .li-card-body {
-            padding: 16px 24px 20px;
-        }
-
-        /* ── Buttons ── */
-        .btn-li-primary {
-            background: var(--li-blue);
-            color: #fff;
-            border: 1.5px solid var(--li-blue);
-            border-radius: 24px;
-            padding: 6px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background .15s, box-shadow .15s;
-            line-height: 1.4;
-        }
-
-        .btn-li-primary:hover {
-            background: var(--li-blue-dark);
-            border-color: var(--li-blue-dark);
-            color: #fff;
-            box-shadow: var(--li-shadow-hover);
-        }
-
-        .btn-li-secondary {
-            background: transparent;
-            color: var(--li-blue);
-            border: 1.5px solid var(--li-blue);
-            border-radius: 24px;
-            padding: 6px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background .15s, box-shadow .15s;
-            line-height: 1.4;
-        }
-
-        .btn-li-secondary:hover {
-            background: var(--li-blue-light);
-            color: var(--li-blue);
-            box-shadow: var(--li-shadow-hover);
-        }
-
-        .btn-li-ghost {
-            background: transparent;
-            color: var(--li-text-sub);
-            border: 1.5px solid var(--li-border);
-            border-radius: 24px;
-            padding: 6px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background .15s;
-            line-height: 1.4;
-        }
-
-        .btn-li-ghost:hover {
-            background: var(--li-bg);
-            color: var(--li-text);
-        }
-
-        .btn-li-danger {
-            background: transparent;
-            color: var(--li-red);
-            border: 1.5px solid var(--li-red);
-            border-radius: 24px;
-            padding: 6px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background .15s;
-            line-height: 1.4;
-        }
-
-        .btn-li-danger:hover {
-            background: #fff0f0;
-        }
-
-        /* ── Form Controls ── */
-        .li-form-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--li-text);
-            margin-bottom: 4px;
-            display: block;
-        }
-
-        .li-form-control {
-            width: 100%;
-            border: 1px solid var(--li-text-sub);
-            border-radius: 4px;
-            padding: 10px 12px;
-            font-size: 14px;
-            font-family: inherit;
-            color: var(--li-text);
-            background: var(--li-surface);
-            outline: none;
-            transition: border-color .15s, box-shadow .15s;
-        }
-
-        .li-form-control:focus {
-            border-color: var(--li-blue);
-            box-shadow: 0 0 0 2px rgba(10,102,194,.15);
-        }
-
+        .li-nav-search { position: relative; flex: 0 1 280px; }
+        .li-nav-search input { width: 100%; background: var(--li-bg); border: 1px solid var(--li-border); border-radius: 4px; padding: 6px 12px 6px 36px; font-size: 14px; font-family: inherit; color: var(--li-text); outline: none; transition: border-color .15s, background .15s; }
+        .li-nav-search input:focus { background: var(--li-surface); border-color: var(--li-blue); }
+        .li-nav-search .li-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--li-text-sub); font-size: 13px; pointer-events: none; }
+        .li-nav-links { display: flex; align-items: center; gap: 4px; list-style: none; margin: 0; padding: 0; }
+        .li-nav-links a { display: flex; flex-direction: column; align-items: center; padding: 4px 12px; color: var(--li-text-sub); text-decoration: none; font-size: 11px; font-weight: 400; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s; white-space: nowrap; height: 52px; justify-content: center; }
+        .li-nav-links a i { font-size: 20px; margin-bottom: 2px; line-height: 1; }
+        .li-nav-links a:hover, .li-nav-links a.active { color: var(--li-text); border-bottom-color: var(--li-text); }
+        .li-card { background: var(--li-surface); border-radius: var(--li-radius); box-shadow: var(--li-shadow); border: none; overflow: hidden; }
+        .btn-li-primary { background: var(--li-blue); color: #fff; border: 1.5px solid var(--li-blue); border-radius: 24px; padding: 6px 20px; font-size: 16px; font-weight: 600; font-family: inherit; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background .15s, box-shadow .15s; line-height: 1.4; }
+        .btn-li-primary:hover { background: var(--li-blue-dark); border-color: var(--li-blue-dark); color: #fff; box-shadow: var(--li-shadow-hover); }
+        .btn-li-secondary { background: transparent; color: var(--li-blue); border: 1.5px solid var(--li-blue); border-radius: 24px; padding: 6px 20px; font-size: 16px; font-weight: 600; font-family: inherit; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background .15s, box-shadow .15s; line-height: 1.4; }
+        .btn-li-secondary:hover { background: var(--li-blue-light); color: var(--li-blue); box-shadow: var(--li-shadow-hover); }
+        .btn-li-ghost { background: transparent; color: var(--li-text-sub); border: 1.5px solid var(--li-border); border-radius: 24px; padding: 6px 20px; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; line-height: 1.4; }
+        .btn-li-ghost:hover { background: var(--li-bg); color: var(--li-text); }
+        .btn-li-danger { background: transparent; color: var(--li-red); border: 1.5px solid var(--li-red); border-radius: 24px; padding: 6px 20px; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; line-height: 1.4; }
+        .btn-li-danger:hover { background: #fff0f0; }
+        .li-form-label { font-size: 14px; font-weight: 600; color: var(--li-text); margin-bottom: 4px; display: block; }
+        .li-form-control { width: 100%; border: 1px solid var(--li-text-sub); border-radius: 4px; padding: 10px 12px; font-size: 14px; font-family: inherit; color: var(--li-text); background: var(--li-surface); outline: none; transition: border-color .15s, box-shadow .15s; }
+        .li-form-control:focus { border-color: var(--li-blue); box-shadow: 0 0 0 2px rgba(10,102,194,.15); }
         .li-form-control::placeholder { color: var(--li-text-light); }
-
-        .li-form-hint {
-            font-size: 12px;
-            color: var(--li-text-sub);
-            margin-top: 4px;
-        }
-
-        /* ── Checkboxes ── */
-        .li-check {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 4px 0;
-            font-size: 14px;
-            color: var(--li-text);
-            user-select: none;
-        }
-
-        .li-check input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            border: 1.5px solid var(--li-text-sub);
-            border-radius: 3px;
-            appearance: none;
-            -webkit-appearance: none;
-            background: var(--li-surface);
-            cursor: pointer;
-            position: relative;
-            flex-shrink: 0;
-            transition: background .1s, border-color .1s;
-        }
-
-        .li-check input[type="checkbox"]:checked {
-            background: var(--li-blue);
-            border-color: var(--li-blue);
-        }
-
-        .li-check input[type="checkbox"]:checked::after {
-            content: '';
-            position: absolute;
-            left: 3px;
-            top: 1px;
-            width: 8px;
-            height: 5px;
-            border-left: 2px solid #fff;
-            border-bottom: 2px solid #fff;
-            transform: rotate(-45deg);
-        }
-
-        /* ── Badges ── */
-        .li-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .li-badge-blue    { background: #e8f0fe; color: var(--li-blue); }
-        .li-badge-green   { background: #e6f4ea; color: var(--li-green); }
-        .li-badge-red     { background: #fce8e6; color: var(--li-red); }
-        .li-badge-gray    { background: #f1f3f4; color: var(--li-text-sub); }
-        .li-badge-orange  { background: #fef3ea; color: var(--li-orange); }
-
-        /* ── Progress Bar ── */
-        .li-progress {
-            height: 4px;
-            background: var(--li-border);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .li-progress-bar {
-            height: 100%;
-            background: var(--li-blue);
-            border-radius: 2px;
-            transition: width .4s ease;
-        }
-
-        /* ── Alerts ── */
-        .li-alert {
-            border-radius: var(--li-radius);
-            padding: 14px 18px;
-            font-size: 14px;
-            border-left: 4px solid;
-        }
-
+        .li-form-hint { font-size: 12px; color: var(--li-text-sub); margin-top: 4px; }
+        .li-check { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 0; font-size: 14px; color: var(--li-text); user-select: none; }
+        .li-check input[type="checkbox"] { width: 16px; height: 16px; border: 1.5px solid var(--li-text-sub); border-radius: 3px; appearance: none; -webkit-appearance: none; background: var(--li-surface); cursor: pointer; position: relative; flex-shrink: 0; transition: background .1s, border-color .1s; }
+        .li-check input[type="checkbox"]:checked { background: var(--li-blue); border-color: var(--li-blue); }
+        .li-check input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 3px; top: 1px; width: 8px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg); }
+        .li-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .li-badge-blue   { background: #e8f0fe; color: var(--li-blue); }
+        .li-badge-green  { background: #e6f4ea; color: var(--li-green); }
+        .li-badge-red    { background: #fce8e6; color: var(--li-red); }
+        .li-badge-gray   { background: #f1f3f4; color: var(--li-text-sub); }
+        .li-badge-orange { background: #fef3ea; color: var(--li-orange); }
+        .li-progress { height: 4px; background: var(--li-border); border-radius: 2px; overflow: hidden; }
+        .li-progress-bar { height: 100%; background: var(--li-blue); border-radius: 2px; transition: width .4s ease; }
+        .li-alert { border-radius: var(--li-radius); padding: 14px 18px; font-size: 14px; border-left: 4px solid; }
         .li-alert-success { background: #e6f4ea; border-color: var(--li-green); color: #1e4620; }
         .li-alert-danger  { background: #fce8e6; border-color: var(--li-red);   color: #7b1e1e; }
         .li-alert-info    { background: #e8f0fe; border-color: var(--li-blue);  color: #1a3a5c; }
         .li-alert-warning { background: #fef3ea; border-color: var(--li-orange); color: #7a3e00; }
-
-        /* ── Divider ── */
-        .li-divider {
-            border: none;
-            border-top: 1px solid var(--li-border);
-            margin: 16px 0;
-        }
-
-        /* ── Section title ── */
-        .li-section-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--li-text);
-            margin-bottom: 4px;
-        }
-
-        .li-section-sub {
-            font-size: 14px;
-            color: var(--li-text-sub);
-            margin-bottom: 0;
-        }
-
-        /* ── Main layout ── */
-        .li-main {
-            max-width: 1128px;
-            margin: 24px auto;
-            padding: 0 16px;
-        }
-
-        /* ── Spinner overlay ── */
-        .li-spinner-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(255,255,255,.75);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .li-spinner-box {
-            background: var(--li-surface);
-            border-radius: var(--li-radius);
-            box-shadow: var(--li-shadow-hover);
-            padding: 32px 40px;
-            text-align: center;
-        }
-
-        .li-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--li-border);
-            border-top-color: var(--li-blue);
-            border-radius: 50%;
-            animation: li-spin .8s linear infinite;
-            margin: 0 auto 12px;
-        }
-
+        .li-divider { border: none; border-top: 1px solid var(--li-border); margin: 16px 0; }
+        .li-main { max-width: 1128px; margin: 24px auto; padding: 0 16px; }
+        .li-spinner-overlay { position: fixed; inset: 0; background: rgba(255,255,255,.75); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .li-spinner-box { background: var(--li-surface); border-radius: var(--li-radius); box-shadow: var(--li-shadow-hover); padding: 32px 40px; text-align: center; }
+        .li-spinner { width: 40px; height: 40px; border: 3px solid var(--li-border); border-top-color: var(--li-blue); border-radius: 50%; animation: li-spin .8s linear infinite; margin: 0 auto 12px; }
         @keyframes li-spin { to { transform: rotate(360deg); } }
-
-        /* ── Flash messages ── */
         .li-flash-container { margin-bottom: 16px; }
-
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-            .li-nav-search { display: none; }
-            .li-nav-links a span { display: none; }
-            .li-nav-links a { padding: 4px 8px; }
-            .li-main { margin: 12px auto; }
-        }
+        @media (max-width: 768px) { .li-nav-search { display: none; } .li-nav-links a span { display: none; } .li-nav-links a { padding: 4px 8px; } .li-main { margin: 12px auto; } }
     </style>
-    {% block extra_css %}{% endblock %}
+    {{block "extra_css" .}}{{end}}
 </head>
 <body>
 
-<!-- ── Navbar ── -->
 <nav class="li-navbar">
     <div class="container">
-        <a class="li-navbar-brand" href="{{ url_for('index') }}">
+        <a class="li-navbar-brand" href="/">
             <i class="fab fa-linkedin li-logo-icon"></i>
         </a>
-
         <div class="li-nav-search">
             <i class="fas fa-search li-search-icon"></i>
             <input type="text" placeholder="İş, şirket veya anahtar kelime ara" id="navSearchInput" autocomplete="off">
         </div>
-
         <div class="li-nav-spacer"></div>
-
         <ul class="li-nav-links">
             <li>
-                <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>
+                <a href="/" {{if eq .CurrentPage "index"}}class="active"{{end}}>
                     <i class="fas fa-search"></i>
                     <span>Yeni Arama</span>
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('jobs_list') }}" {% if request.endpoint == 'jobs_list' %}class="active"{% endif %}>
+                <a href="/jobs" {{if eq .CurrentPage "jobs"}}class="active"{{end}}>
                     <i class="fas fa-briefcase"></i>
                     <span>Aramalarım</span>
                 </a>
@@ -498,33 +112,19 @@
     </div>
 </nav>
 
-<!-- ── Main ── -->
 <main class="li-main">
-
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="li-flash-container">
-            {% for category, message in messages %}
-                {% set alert_class = 'li-alert-info' %}
-                {% if category == 'success' %}{% set alert_class = 'li-alert-success' %}{% endif %}
-                {% if category == 'danger' %}{% set alert_class = 'li-alert-danger' %}{% endif %}
-                {% if category == 'warning' %}{% set alert_class = 'li-alert-warning' %}{% endif %}
-                <div class="li-alert {{ alert_class }} d-flex justify-content-between align-items-start mb-2">
-                    <span>{{ message }}</span>
-                    <button type="button"
-                            onclick="this.closest('.li-alert').style.display='none'"
-                            style="background:none;border:none;cursor:pointer;font-size:16px;padding:0 0 0 16px;color:inherit;opacity:.6;">&times;</button>
-                </div>
-            {% endfor %}
+    {{range .Flash}}
+    <div class="li-flash-container">
+        <div class="li-alert {{if eq .Category "success"}}li-alert-success{{else if eq .Category "danger"}}li-alert-danger{{else if eq .Category "warning"}}li-alert-warning{{else}}li-alert-info{{end}} d-flex justify-content-between align-items-start mb-2">
+            <span>{{.Message}}</span>
+            <button type="button" onclick="this.closest('.li-alert').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:16px;padding:0 0 0 16px;color:inherit;opacity:.6;">&times;</button>
         </div>
-        {% endif %}
-    {% endwith %}
+    </div>
+    {{end}}
 
-    {% block content %}{% endblock %}
+    {{block "content" .}}{{end}}
 </main>
 
-<!-- ── Footer ── -->
 <footer style="border-top:1px solid var(--li-border);background:var(--li-surface);padding:20px 0;margin-top:48px;">
     <div class="container text-center" style="color:var(--li-text-sub);font-size:12px;">
         <i class="fab fa-linkedin" style="color:var(--li-blue);font-size:16px;margin-right:4px;"></i>
@@ -532,7 +132,6 @@
     </div>
 </footer>
 
-<!-- ── Spinner Overlay ── -->
 <div class="li-spinner-overlay" id="loadingSpinner">
     <div class="li-spinner-box">
         <div class="li-spinner"></div>
@@ -540,36 +139,25 @@
     </div>
 </div>
 
-<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function showLoading() {
-        document.getElementById('loadingSpinner').style.display = 'flex';
-    }
-    function hideLoading() {
-        document.getElementById('loadingSpinner').style.display = 'none';
-    }
-
-    // Nav search — ana sayfadaysa formu doldur
-    const navSearch = document.getElementById('navSearchInput');
-    if (navSearch) {
-        navSearch.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && this.value.trim()) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/start_search';
-                const inp = document.createElement('input');
-                inp.type = 'hidden'; inp.name = 'keywords'; inp.value = this.value.trim();
-                const pages = document.createElement('input');
-                pages.type = 'hidden'; pages.name = 'max_pages'; pages.value = '5';
-                form.appendChild(inp); form.appendChild(pages);
-                document.body.appendChild(form);
-                showLoading();
-                form.submit();
-            }
-        });
-    }
+function showLoading() { document.getElementById('loadingSpinner').style.display = 'flex'; }
+function hideLoading() { document.getElementById('loadingSpinner').style.display = 'none'; }
+const navSearch = document.getElementById('navSearchInput');
+if (navSearch) {
+    navSearch.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && this.value.trim()) {
+            const form = document.createElement('form');
+            form.method = 'POST'; form.action = '/start_search';
+            const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = 'keywords'; inp.value = this.value.trim();
+            const pages = document.createElement('input'); pages.type = 'hidden'; pages.name = 'max_pages'; pages.value = '5';
+            form.appendChild(inp); form.appendChild(pages);
+            document.body.appendChild(form); showLoading(); form.submit();
+        }
+    });
+}
 </script>
-{% block extra_js %}{% endblock %}
+{{block "extra_js" .}}{{end}}
 </body>
 </html>
+{{end}}

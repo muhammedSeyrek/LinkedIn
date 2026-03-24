@@ -1,207 +1,54 @@
-{% extends "base.html" %}
+{{define "title"}}Aramalarım{{end}}
 
-{% block title %}Aramalarım{% endblock %}
-
-{% block extra_css %}
+{{define "extra_css"}}
 <style>
-    .page-header {
-        background: var(--li-surface);
-        border-radius: var(--li-radius);
-        box-shadow: var(--li-shadow);
-        padding: 24px 28px;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
-
-    .page-header h1 {
-        font-size: 22px;
-        font-weight: 700;
-        color: var(--li-text);
-        margin: 0 0 2px;
-    }
-
+    .page-header { background: var(--li-surface); border-radius: var(--li-radius); box-shadow: var(--li-shadow); padding: 24px 28px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-header h1 { font-size: 22px; font-weight: 700; color: var(--li-text); margin: 0 0 2px; }
     .page-header p { font-size: 14px; color: var(--li-text-sub); margin: 0; }
-
-    /* Filter bar */
-    .filter-bar {
-        background: var(--li-surface);
-        border-radius: var(--li-radius);
-        box-shadow: var(--li-shadow);
-        padding: 12px 20px;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
+    .filter-bar { background: var(--li-surface); border-radius: var(--li-radius); box-shadow: var(--li-shadow); padding: 12px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .filter-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
-
-    .filter-tab {
-        padding: 5px 14px;
-        border-radius: 24px;
-        font-size: 13px;
-        font-weight: 500;
-        border: 1.5px solid var(--li-border);
-        background: transparent;
-        color: var(--li-text-sub);
-        cursor: pointer;
-        transition: all .15s;
-        font-family: inherit;
-    }
-
+    .filter-tab { padding: 5px 14px; border-radius: 24px; font-size: 13px; font-weight: 500; border: 1.5px solid var(--li-border); background: transparent; color: var(--li-text-sub); cursor: pointer; transition: all .15s; font-family: inherit; }
     .filter-tab:hover { border-color: var(--li-blue); color: var(--li-blue); }
     .filter-tab.active { background: var(--li-blue); border-color: var(--li-blue); color: #fff; }
-
-    .search-box {
-        position: relative;
-        flex: 1;
-        min-width: 200px;
-        max-width: 320px;
-    }
-
-    .search-box input {
-        width: 100%;
-        border: 1px solid var(--li-border);
-        border-radius: 4px;
-        padding: 7px 12px 7px 34px;
-        font-size: 13px;
-        font-family: inherit;
-        color: var(--li-text);
-        background: var(--li-bg);
-        outline: none;
-        transition: border-color .15s;
-    }
-
-    .search-box input:focus {
-        border-color: var(--li-blue);
-        background: var(--li-surface);
-    }
-
-    .search-box i {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--li-text-sub);
-        font-size: 12px;
-        pointer-events: none;
-    }
-
-    /* Job card */
-    .job-card {
-        background: var(--li-surface);
-        border-radius: var(--li-radius);
-        box-shadow: var(--li-shadow);
-        margin-bottom: 10px;
-        overflow: hidden;
-        transition: box-shadow .15s;
-    }
-
+    .search-box { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+    .search-box input { width: 100%; border: 1px solid var(--li-border); border-radius: 4px; padding: 7px 12px 7px 34px; font-size: 13px; font-family: inherit; color: var(--li-text); background: var(--li-bg); outline: none; transition: border-color .15s; }
+    .search-box input:focus { border-color: var(--li-blue); background: var(--li-surface); }
+    .search-box i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--li-text-sub); font-size: 12px; pointer-events: none; }
+    .job-card { background: var(--li-surface); border-radius: var(--li-radius); box-shadow: var(--li-shadow); margin-bottom: 10px; overflow: hidden; transition: box-shadow .15s; }
     .job-card:hover { box-shadow: var(--li-shadow-hover); }
-
-    .job-card-body {
-        padding: 16px 20px;
-        display: flex;
-        gap: 16px;
-        align-items: flex-start;
-    }
-
-    @media (max-width: 768px) {
-        .job-card-body { flex-direction: column; }
-        .job-card-right { width: 100%; }
-    }
-
+    .job-card-body { padding: 16px 20px; display: flex; gap: 16px; align-items: flex-start; }
+    @media (max-width: 768px) { .job-card-body { flex-direction: column; } .job-card-right { width: 100%; } }
     .job-card-left { flex: 1; min-width: 0; }
     .job-card-right { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-
-    .job-keywords {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--li-text);
-        margin-bottom: 4px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .job-meta-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px 16px;
-        font-size: 13px;
-        color: var(--li-text-sub);
-        margin-bottom: 8px;
-    }
-
+    .job-keywords { font-size: 16px; font-weight: 600; color: var(--li-text); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .job-meta-row { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--li-text-sub); margin-bottom: 8px; }
     .job-meta-item { display: flex; align-items: center; gap: 5px; }
-
     .tags-row { display: flex; flex-wrap: wrap; gap: 6px; }
-
-    .job-count {
-        font-size: 22px;
-        font-weight: 700;
-        color: var(--li-green);
-        line-height: 1;
-    }
-
-    .job-count-label {
-        font-size: 11px;
-        color: var(--li-text-sub);
-        margin-top: 2px;
-    }
-
+    .job-count { font-size: 22px; font-weight: 700; color: var(--li-green); line-height: 1; }
+    .job-count-label { font-size: 11px; color: var(--li-text-sub); margin-top: 2px; }
     .actions-row { display: flex; gap: 6px; flex-wrap: wrap; }
-
-    /* Empty state */
-    .empty-state {
-        background: var(--li-surface);
-        border-radius: var(--li-radius);
-        box-shadow: var(--li-shadow);
-        padding: 60px 32px;
-        text-align: center;
-    }
-
-    .empty-state .empty-icon {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: var(--li-bg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        font-size: 32px;
-        color: var(--li-text-sub);
-    }
+    .empty-state { background: var(--li-surface); border-radius: var(--li-radius); box-shadow: var(--li-shadow); padding: 60px 32px; text-align: center; }
+    .empty-state .empty-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--li-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; color: var(--li-text-sub); }
 </style>
-{% endblock %}
+{{end}}
 
-{% block content %}
+{{define "content"}}
 <div class="row justify-content-center">
     <div class="col-lg-10 col-xl-9">
 
-        <!-- Page Header -->
         <div class="page-header">
             <div>
                 <h1><i class="fas fa-briefcase me-2" style="color:var(--li-blue);font-size:20px;"></i>Aramalarım</h1>
                 <p>LinkedIn iş araması geçmişiniz ve sonuçları</p>
             </div>
-            <a href="{{ url_for('index') }}" class="btn-li-primary">
-                <i class="fas fa-plus"></i> Yeni Arama
-            </a>
+            <a href="/" class="btn-li-primary"><i class="fas fa-plus"></i> Yeni Arama</a>
         </div>
 
-        {% if jobs %}
+        {{if .Jobs}}
 
-        <!-- Filter Bar -->
         <div class="filter-bar">
             <div class="filter-tabs">
-                <button class="filter-tab active" data-filter="all">Tümü ({{ jobs|length }})</button>
+                <button class="filter-tab active" data-filter="all">Tümü ({{len .Jobs}})</button>
                 <button class="filter-tab" data-filter="completed">Tamamlanan</button>
                 <button class="filter-tab" data-filter="running">Devam Eden</button>
                 <button class="filter-tab" data-filter="failed">Başarısız</button>
@@ -212,176 +59,107 @@
             </div>
         </div>
 
-        <!-- Job Cards -->
         <div id="jobsList">
-            {% for job in jobs %}
+            {{range .Jobs}}
             <div class="job-card"
-                 data-status="{{ job.status }}"
-                 data-keywords="{{ job.params.keywords|lower }}"
-                 data-location="{{ job.params.location|lower if job.params.location else '' }}">
+                 data-status="{{.Status}}"
+                 data-keywords="{{lower .Params.Keywords}}"
+                 data-location="{{lower .Params.Location}}">
 
                 <div class="job-card-body">
-
-                    <!-- Left: info -->
                     <div class="job-card-left">
                         <div class="job-keywords">
                             <i class="fas fa-search me-2" style="color:var(--li-blue);font-size:13px;"></i>
-                            {{ job.params.keywords }}
+                            {{.Params.Keywords}}
                         </div>
 
                         <div class="job-meta-row">
-                            {% if job.params.location %}
-                            <span class="job-meta-item">
-                                <i class="fas fa-map-marker-alt"></i>{{ job.params.location }}
-                            </span>
-                            {% endif %}
-                            <span class="job-meta-item">
-                                <i class="far fa-calendar"></i>{{ job.created_at }}
-                            </span>
-                            <span class="job-meta-item">
-                                <i class="fas fa-file-alt"></i>{{ job.params.max_pages }} sayfa
-                            </span>
+                            {{if .Params.Location}}<span class="job-meta-item"><i class="fas fa-map-marker-alt"></i>{{.Params.Location}}</span>{{end}}
+                            <span class="job-meta-item"><i class="far fa-calendar"></i>{{.CreatedAt}}</span>
+                            <span class="job-meta-item"><i class="fas fa-file-alt"></i>{{.Params.MaxPages}} sayfa</span>
                         </div>
 
                         <div class="tags-row">
-                            {% if job.params.job_types %}
-                                {% for type in job.params.job_types %}
-                                <span class="li-badge li-badge-gray">
-                                    {% if type == 'F' %}Tam Zamanlı
-                                    {% elif type == 'P' %}Yarı Zamanlı
-                                    {% elif type == 'C' %}Sözleşmeli
-                                    {% elif type == 'T' %}Geçici
-                                    {% elif type == 'I' %}Staj
-                                    {% endif %}
-                                </span>
-                                {% endfor %}
-                            {% endif %}
-                            {% if job.params.remote_options %}
-                                {% for option in job.params.remote_options %}
-                                <span class="li-badge li-badge-blue">
-                                    {% if option == '1' %}Uzaktan
-                                    {% elif option == '2' %}Hibrit
-                                    {% elif option == '3' %}Ofiste
-                                    {% endif %}
-                                </span>
-                                {% endfor %}
-                            {% endif %}
+                            {{range .Params.JobTypes}}<span class="li-badge li-badge-gray">{{jobTypeName .}}</span>{{end}}
+                            {{range .Params.RemoteOptions}}<span class="li-badge li-badge-blue">{{remoteOptionName .}}</span>{{end}}
                         </div>
 
-                        {% if job.status == 'running' %}
+                        {{if eq .Status "running"}}
                         <div class="mt-2" style="max-width:320px;">
                             <div class="li-progress">
-                                <div class="li-progress-bar" style="width:{{ job.progress|default(0) }}%;"></div>
+                                <div class="li-progress-bar" style="width:{{printf "%.0f" .Progress}}%;"></div>
                             </div>
                             <p style="font-size:12px;color:var(--li-text-sub);margin-top:4px;">
-                                %{{ job.progress|default(0)|round }} tamamlandı
-                                {% if job.found_jobs %} · {{ job.found_jobs }} ilan{% endif %}
+                                %{{printf "%.0f" .Progress}} tamamlandı{{if .FoundJobs}} · {{.FoundJobs}} ilan{{end}}
                             </p>
                         </div>
-                        {% endif %}
+                        {{end}}
 
-                        {% if job.status == 'failed' and job.error %}
-                        <p style="font-size:12px;color:var(--li-red);margin-top:6px;">
-                            {{ job.error[:120] }}{% if job.error|length > 120 %}…{% endif %}
-                        </p>
-                        {% endif %}
+                        {{if and (eq .Status "failed") .Error}}
+                        <p style="font-size:12px;color:var(--li-red);margin-top:6px;">{{truncate .Error 120}}</p>
+                        {{end}}
                     </div>
 
-                    <!-- Right: status + actions -->
                     <div class="job-card-right">
-                        <!-- Status badge -->
-                        {% if job.status == 'completed' %}
-                            <span class="li-badge li-badge-green">
-                                <i class="fas fa-check-circle"></i> Tamamlandı
-                            </span>
-                            {% if job.found_jobs %}
-                            <div style="text-align:right;">
-                                <div class="job-count">{{ job.found_jobs }}</div>
-                                <div class="job-count-label">ilan bulundu</div>
-                            </div>
-                            {% endif %}
-                        {% elif job.status == 'running' %}
-                            <span class="li-badge li-badge-blue">
-                                <i class="fas fa-sync-alt fa-spin"></i> Devam Ediyor
-                            </span>
-                        {% elif job.status == 'failed' %}
-                            <span class="li-badge li-badge-red">
-                                <i class="fas fa-times-circle"></i> Başarısız
-                            </span>
-                        {% else %}
-                            <span class="li-badge li-badge-gray">
-                                <i class="fas fa-clock"></i> Bekliyor
-                            </span>
-                        {% endif %}
+                        {{if eq .Status "completed"}}
+                            <span class="li-badge li-badge-green"><i class="fas fa-check-circle"></i> Tamamlandı</span>
+                            {{if .FoundJobs}}<div style="text-align:right;"><div class="job-count">{{.FoundJobs}}</div><div class="job-count-label">ilan bulundu</div></div>{{end}}
+                        {{else if eq .Status "running"}}
+                            <span class="li-badge li-badge-blue"><i class="fas fa-sync-alt fa-spin"></i> Devam Ediyor</span>
+                        {{else if eq .Status "failed"}}
+                            <span class="li-badge li-badge-red"><i class="fas fa-times-circle"></i> Başarısız</span>
+                        {{else}}
+                            <span class="li-badge li-badge-gray"><i class="fas fa-clock"></i> Bekliyor</span>
+                        {{end}}
 
-                        <!-- Actions -->
                         <div class="actions-row">
-                            {% if job.status == 'completed' and job.result_file %}
-                            <a href="{{ url_for('download_results', job_id=job.id) }}" class="btn-li-primary" style="font-size:13px;padding:5px 14px;">
-                                <i class="fas fa-download"></i> İndir
-                            </a>
-                            {% endif %}
+                            {{if and (eq .Status "completed") .ResultFile}}
+                            <a href="/download/{{.ID}}" class="btn-li-primary" style="font-size:13px;padding:5px 14px;"><i class="fas fa-download"></i> İndir</a>
+                            {{end}}
 
-                            {% if job.status == 'running' %}
-                            <a href="{{ url_for('job_status', job_id=job.id) }}" class="btn-li-primary" style="font-size:13px;padding:5px 14px;">
-                                <i class="fas fa-eye"></i> İzle
-                            </a>
-                            {% else %}
-                            <a href="{{ url_for('job_status', job_id=job.id) }}" class="btn-li-secondary" style="font-size:13px;padding:5px 14px;">
-                                <i class="fas fa-info-circle"></i> Detay
-                            </a>
-                            {% endif %}
+                            {{if eq .Status "running"}}
+                            <a href="/job_status/{{.ID}}" class="btn-li-primary" style="font-size:13px;padding:5px 14px;"><i class="fas fa-eye"></i> İzle</a>
+                            {{else}}
+                            <a href="/job_status/{{.ID}}" class="btn-li-secondary" style="font-size:13px;padding:5px 14px;"><i class="fas fa-info-circle"></i> Detay</a>
+                            {{end}}
 
-                            {% if job.status in ['completed', 'failed'] %}
-                            <button class="btn-li-ghost"
-                                    style="font-size:13px;padding:5px 14px;"
-                                    onclick="duplicateSearch('{{ job.params|tojson|e }}')">
+                            {{if or (eq .Status "completed") (eq .Status "failed")}}
+                            <button class="btn-li-ghost" style="font-size:13px;padding:5px 14px;" onclick="duplicateSearch('{{toJSON .Params}}')">
                                 <i class="fas fa-redo"></i> Tekrarla
                             </button>
-                            {% endif %}
+                            {{end}}
                         </div>
                     </div>
 
                 </div>
             </div>
-            {% endfor %}
+            {{end}}
         </div>
 
-        <!-- No results message -->
         <div id="noResults" class="empty-state" style="display:none;">
             <div class="empty-icon"><i class="fas fa-search"></i></div>
             <h4 style="font-size:18px;font-weight:600;margin-bottom:8px;">Sonuç bulunamadı</h4>
             <p style="color:var(--li-text-sub);">Filtre veya arama kriterlerini değiştirip tekrar deneyin.</p>
         </div>
 
-        {% else %}
+        {{else}}
 
-        <!-- Empty state -->
         <div class="empty-state">
             <div class="empty-icon"><i class="fab fa-linkedin"></i></div>
             <h3 style="font-size:22px;font-weight:700;margin-bottom:8px;">Henüz Bir Arama Yapmadınız</h3>
-            <p style="color:var(--li-text-sub);max-width:400px;margin:0 auto 24px;">
-                LinkedIn'deki iş ilanlarını taramak için yeni bir arama başlatın.
-            </p>
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <a href="{{ url_for('index') }}" class="btn-li-primary">
-                    <i class="fas fa-search"></i> İlk Aramayı Başlat
-                </a>
-            </div>
+            <p style="color:var(--li-text-sub);max-width:400px;margin:0 auto 24px;">LinkedIn'deki iş ilanlarını taramak için yeni bir arama başlatın.</p>
+            <a href="/" class="btn-li-primary"><i class="fas fa-search"></i> İlk Aramayı Başlat</a>
         </div>
 
-        {% endif %}
+        {{end}}
     </div>
 </div>
-{% endblock %}
+{{end}}
 
-{% block extra_js %}
+{{define "extra_js"}}
 <script>
 function filterJobs(status) {
-    document.querySelectorAll('.filter-tab').forEach(t => {
-        t.classList.toggle('active', t.dataset.filter === status);
-    });
-
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === status));
     let visible = 0;
     document.querySelectorAll('.job-card').forEach(card => {
         const show = status === 'all' || card.dataset.status === status;
@@ -395,9 +173,7 @@ function searchJobs(q) {
     const term = q.toLowerCase();
     let visible = 0;
     document.querySelectorAll('.job-card').forEach(card => {
-        const match = !term ||
-            card.dataset.keywords.includes(term) ||
-            card.dataset.location.includes(term);
+        const match = !term || card.dataset.keywords.includes(term) || card.dataset.location.includes(term);
         card.style.display = match ? 'block' : 'none';
         if (match) visible++;
     });
@@ -408,12 +184,10 @@ function duplicateSearch(allParamsJson) {
     try {
         const params = JSON.parse(allParamsJson);
         const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ url_for("start_search") }}';
-
+        form.method = 'POST'; form.action = '/start_search';
         Object.keys(params).forEach(key => {
             const val = params[key];
-            if (key === 'password') return; // never resubmit password
+            if (key === 'password') return;
             const items = Array.isArray(val) ? val : (val !== null && val !== undefined && val !== '' ? [val] : []);
             items.forEach(v => {
                 const inp = document.createElement('input');
@@ -421,54 +195,28 @@ function duplicateSearch(allParamsJson) {
                 form.appendChild(inp);
             });
         });
-
-        document.body.appendChild(form);
-        showLoading();
-        form.submit();
-    } catch(e) {
-        console.error('Tekrarlama hatası:', e);
-    }
+        document.body.appendChild(form); showLoading(); form.submit();
+    } catch(e) { console.error('Tekrarlama hatası:', e); }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Filter tabs
-    document.querySelectorAll('.filter-tab').forEach(tab => {
-        tab.addEventListener('click', () => filterJobs(tab.dataset.filter));
-    });
-
-    // Search input
+    document.querySelectorAll('.filter-tab').forEach(tab => tab.addEventListener('click', () => filterJobs(tab.dataset.filter)));
     let searchTimeout;
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => searchJobs(this.value), 300);
-        });
-    }
+    const si = document.getElementById('searchInput');
+    if (si) si.addEventListener('input', function() { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => searchJobs(this.value), 300); });
 
-    // Auto-update running jobs every 5s
     function updateRunningJobs() {
         document.querySelectorAll('.job-card[data-status="running"]').forEach(card => {
             const link = card.querySelector('a[href*="job_status"]');
             if (!link) return;
             const jobId = link.href.split('/').pop();
-            fetch(`/api/job_status/${jobId}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.status !== 'running') {
-                        location.reload();
-                    } else {
-                        const bar = card.querySelector('.li-progress-bar');
-                        if (bar) bar.style.width = (data.progress || 0) + '%';
-                    }
-                })
-                .catch(() => {});
+            fetch(`/api/job_status/${jobId}`).then(r => r.json()).then(data => {
+                if (data.status !== 'running') location.reload();
+                else { const bar = card.querySelector('.li-progress-bar'); if (bar) bar.style.width = (data.progress||0)+'%'; }
+            }).catch(()=>{});
         });
     }
-
-    if (document.querySelectorAll('[data-status="running"]').length > 0) {
-        setInterval(updateRunningJobs, 5000);
-    }
+    if (document.querySelectorAll('[data-status="running"]').length > 0) setInterval(updateRunningJobs, 5000);
 });
 </script>
-{% endblock %}
+{{end}}

@@ -1,151 +1,33 @@
-{% extends "base.html" %}
+{{define "title"}}İş Arama{{end}}
 
-{% block title %}İş Arama{% endblock %}
-
-{% block extra_css %}
+{{define "extra_css"}}
 <style>
-    .hero-section {
-        background: var(--li-surface);
-        border-radius: var(--li-radius);
-        box-shadow: var(--li-shadow);
-        padding: 40px 32px 32px;
-        margin-bottom: 16px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--li-blue) 0%, #38a1f3 100%);
-    }
-
-    .hero-title {
-        font-size: 28px;
-        font-weight: 700;
-        color: var(--li-text);
-        margin-bottom: 6px;
-        line-height: 1.3;
-    }
-
-    .hero-sub {
-        font-size: 16px;
-        color: var(--li-text-sub);
-        margin-bottom: 0;
-    }
-
-    .form-section {
-        background: var(--li-surface);
-        border-radius: var(--li-radius);
-        box-shadow: var(--li-shadow);
-        overflow: hidden;
-    }
-
-    .form-section-header {
-        padding: 20px 24px 16px;
-        border-bottom: 1px solid var(--li-border);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .form-section-header h2 {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--li-text);
-        margin: 0;
-    }
-
+    .hero-section { background: var(--li-surface); border-radius: var(--li-radius); box-shadow: var(--li-shadow); padding: 40px 32px 32px; margin-bottom: 16px; position: relative; overflow: hidden; }
+    .hero-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--li-blue) 0%, #38a1f3 100%); }
+    .hero-title { font-size: 28px; font-weight: 700; color: var(--li-text); margin-bottom: 6px; line-height: 1.3; }
+    .hero-sub { font-size: 16px; color: var(--li-text-sub); margin-bottom: 0; }
+    .form-section { background: var(--li-surface); border-radius: var(--li-radius); box-shadow: var(--li-shadow); overflow: hidden; }
+    .form-section-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--li-border); display: flex; align-items: center; gap: 10px; }
+    .form-section-header h2 { font-size: 16px; font-weight: 600; color: var(--li-text); margin: 0; }
     .form-section-body { padding: 20px 24px 24px; }
-
-    .filter-group-title {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--li-text-sub);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 10px;
-    }
-
-    .filter-group {
-        padding: 16px;
-        background: var(--li-bg);
-        border-radius: 6px;
-        height: 100%;
-    }
-
-    .li-select {
-        width: 100%;
-        border: 1px solid var(--li-text-sub);
-        border-radius: 4px;
-        padding: 10px 12px;
-        font-size: 14px;
-        font-family: inherit;
-        color: var(--li-text);
-        background: var(--li-surface);
-        outline: none;
-        transition: border-color .15s, box-shadow .15s;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 12px center;
-        padding-right: 32px;
-    }
-
-    .li-select:focus {
-        border-color: var(--li-blue);
-        box-shadow: 0 0 0 2px rgba(10,102,194,.15);
-    }
-
-    .credentials-section {
-        border: 1px solid var(--li-border);
-        border-radius: 6px;
-        overflow: hidden;
-    }
-
-    .credentials-header {
-        background: var(--li-bg);
-        padding: 12px 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        user-select: none;
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--li-text);
-        border-bottom: 1px solid var(--li-border);
-    }
-
+    .filter-group-title { font-size: 12px; font-weight: 600; color: var(--li-text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .filter-group { padding: 16px; background: var(--li-bg); border-radius: 6px; height: 100%; }
+    .li-select { width: 100%; border: 1px solid var(--li-text-sub); border-radius: 4px; padding: 10px 12px; font-size: 14px; font-family: inherit; color: var(--li-text); background: var(--li-surface); outline: none; transition: border-color .15s, box-shadow .15s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+    .li-select:focus { border-color: var(--li-blue); box-shadow: 0 0 0 2px rgba(10,102,194,.15); }
+    .credentials-section { border: 1px solid var(--li-border); border-radius: 6px; overflow: hidden; }
+    .credentials-header { background: var(--li-bg); padding: 12px 16px; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 14px; font-weight: 600; color: var(--li-text); border-bottom: 1px solid var(--li-border); }
     .credentials-header:hover { background: #ebebeb; }
-
     .credentials-body { padding: 16px; display: none; }
     .credentials-body.open { display: block; }
-
-    .submit-bar {
-        padding: 16px 24px;
-        border-top: 1px solid var(--li-border);
-        background: var(--li-surface);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .submit-bar .hint {
-        font-size: 12px;
-        color: var(--li-text-sub);
-    }
+    .submit-bar { padding: 16px 24px; border-top: 1px solid var(--li-border); background: var(--li-surface); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .submit-bar .hint { font-size: 12px; color: var(--li-text-sub); }
 </style>
-{% endblock %}
+{{end}}
 
-{% block content %}
+{{define "content"}}
 <div class="row justify-content-center">
     <div class="col-lg-9 col-xl-8">
 
-        <!-- Hero -->
         <div class="hero-section mb-4">
             <div class="d-flex align-items-center gap-3 mb-3">
                 <i class="fab fa-linkedin" style="font-size:48px;color:var(--li-blue);"></i>
@@ -155,17 +37,15 @@
                 </div>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                <a href="{{ url_for('jobs_list') }}" class="btn-li-secondary" style="font-size:14px;padding:5px 16px;">
+                <a href="/jobs" class="btn-li-secondary" style="font-size:14px;padding:5px 16px;">
                     <i class="fas fa-history"></i> Önceki Aramalar
                 </a>
             </div>
         </div>
 
-        <!-- Search Form -->
-        <form action="{{ url_for('start_search') }}" method="POST" id="jobSearchForm">
-            <div class="form-section" id="search-form">
+        <form action="/start_search" method="POST" id="jobSearchForm">
+            <div class="form-section">
 
-                <!-- Temel arama -->
                 <div class="form-section-header">
                     <i class="fas fa-search" style="color:var(--li-blue);font-size:16px;"></i>
                     <h2>Arama Kriterleri</h2>
@@ -173,84 +53,47 @@
                 <div class="form-section-body">
                     <div class="row g-3 mb-4">
                         <div class="col-md-7">
-                            <label class="li-form-label">
-                                Anahtar Kelimeler <span style="color:var(--li-red)">*</span>
-                            </label>
-                            <input type="text" class="li-form-control" name="keywords" required
-                                   placeholder="Örn: Python Developer, Data Scientist, UX Designer">
+                            <label class="li-form-label">Anahtar Kelimeler <span style="color:var(--li-red)">*</span></label>
+                            <input type="text" class="li-form-control" name="keywords" required placeholder="Örn: Python Developer, Data Scientist, UX Designer">
                             <p class="li-form-hint">Pozisyon, beceri veya şirket adı girebilirsiniz</p>
                         </div>
                         <div class="col-md-5">
                             <label class="li-form-label">Lokasyon</label>
-                            <input type="text" class="li-form-control" name="location"
-                                   placeholder="Örn: İstanbul, Türkiye">
+                            <input type="text" class="li-form-control" name="location" placeholder="Örn: İstanbul, Türkiye">
                             <p class="li-form-hint">Boş bırakırsanız tüm lokasyonlar</p>
                         </div>
                     </div>
 
                     <hr class="li-divider">
 
-                    <!-- Filtreler -->
                     <p class="filter-group-title mb-3">Gelişmiş Filtreler</p>
                     <div class="row g-3 mb-4">
-
-                        <!-- İş Türü -->
                         <div class="col-md-4">
                             <div class="filter-group">
                                 <p class="filter-group-title">İş Türü</p>
-                                <label class="li-check">
-                                    <input type="checkbox" name="job_types" value="F"> Tam Zamanlı
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="job_types" value="P"> Yarı Zamanlı
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="job_types" value="C"> Sözleşmeli
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="job_types" value="T"> Geçici
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="job_types" value="I"> Staj
-                                </label>
+                                <label class="li-check"><input type="checkbox" name="job_types" value="F"> Tam Zamanlı</label>
+                                <label class="li-check"><input type="checkbox" name="job_types" value="P"> Yarı Zamanlı</label>
+                                <label class="li-check"><input type="checkbox" name="job_types" value="C"> Sözleşmeli</label>
+                                <label class="li-check"><input type="checkbox" name="job_types" value="T"> Geçici</label>
+                                <label class="li-check"><input type="checkbox" name="job_types" value="I"> Staj</label>
                             </div>
                         </div>
-
-                        <!-- Deneyim -->
                         <div class="col-md-4">
                             <div class="filter-group">
                                 <p class="filter-group-title">Deneyim Seviyesi</p>
-                                <label class="li-check">
-                                    <input type="checkbox" name="experience_levels" value="1"> Stajyer
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="experience_levels" value="2"> Yeni Mezun
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="experience_levels" value="3"> Orta Düzey
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="experience_levels" value="4"> Kıdemli
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="experience_levels" value="5"> Direktör+
-                                </label>
+                                <label class="li-check"><input type="checkbox" name="experience_levels" value="1"> Stajyer</label>
+                                <label class="li-check"><input type="checkbox" name="experience_levels" value="2"> Yeni Mezun</label>
+                                <label class="li-check"><input type="checkbox" name="experience_levels" value="3"> Orta Düzey</label>
+                                <label class="li-check"><input type="checkbox" name="experience_levels" value="4"> Kıdemli</label>
+                                <label class="li-check"><input type="checkbox" name="experience_levels" value="5"> Direktör+</label>
                             </div>
                         </div>
-
-                        <!-- Remote -->
                         <div class="col-md-4">
                             <div class="filter-group">
                                 <p class="filter-group-title">Çalışma Şekli</p>
-                                <label class="li-check">
-                                    <input type="checkbox" name="remote_options" value="1"> Uzaktan
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="remote_options" value="2"> Hibrit
-                                </label>
-                                <label class="li-check">
-                                    <input type="checkbox" name="remote_options" value="3"> Ofiste
-                                </label>
+                                <label class="li-check"><input type="checkbox" name="remote_options" value="1"> Uzaktan</label>
+                                <label class="li-check"><input type="checkbox" name="remote_options" value="2"> Hibrit</label>
+                                <label class="li-check"><input type="checkbox" name="remote_options" value="3"> Ofiste</label>
                             </div>
                         </div>
                     </div>
@@ -272,53 +115,41 @@
                         </div>
                     </div>
 
-                    <!-- LinkedIn Credentials -->
                     <div class="credentials-section">
-                        <div class="credentials-header" id="credToggle" onclick="toggleCreds()">
+                        <div class="credentials-header" onclick="toggleCreds()">
                             <i class="fab fa-linkedin" style="color:var(--li-blue);font-size:18px;"></i>
                             LinkedIn Hesabı ile Giriş <span style="color:var(--li-text-sub);font-weight:400;">(Opsiyonel)</span>
                             <i class="fas fa-chevron-down ms-auto" id="credChevron" style="font-size:11px;transition:transform .2s;"></i>
                         </div>
                         <div class="credentials-body" id="credBody">
-                            <p style="font-size:13px;color:var(--li-text-sub);margin-bottom:12px;">
-                                LinkedIn hesabınızla giriş yaparak daha fazla ilana erişebilirsiniz.
-                                Bilgileriniz sadece bu arama için kullanılır ve saklanmaz.
-                            </p>
+                            <p style="font-size:13px;color:var(--li-text-sub);margin-bottom:12px;">LinkedIn hesabınızla giriş yaparak daha fazla ilana erişebilirsiniz.</p>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="li-form-label">E-posta</label>
-                                    <input type="email" class="li-form-control" name="email"
-                                           placeholder="ornek@email.com" autocomplete="username">
+                                    <input type="email" class="li-form-control" name="email" placeholder="ornek@email.com" autocomplete="username">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="li-form-label">Şifre</label>
-                                    <input type="password" class="li-form-control" name="password"
-                                           autocomplete="current-password">
+                                    <input type="password" class="li-form-control" name="password" autocomplete="current-password">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Submit bar -->
                 <div class="submit-bar">
-                    <p class="hint mb-0">
-                        <i class="fas fa-info-circle me-1" style="color:var(--li-blue);"></i>
-                        Arama arkaplanda çalışır, sayfayı kapatabilirsiniz.
-                    </p>
-                    <button type="submit" class="btn-li-primary">
-                        <i class="fas fa-search"></i> Aramayı Başlat
-                    </button>
+                    <p class="hint mb-0"><i class="fas fa-info-circle me-1" style="color:var(--li-blue);"></i>Arama arkaplanda çalışır, sayfayı kapatabilirsiniz.</p>
+                    <button type="submit" class="btn-li-primary"><i class="fas fa-search"></i> Aramayı Başlat</button>
                 </div>
 
-            </div><!-- /.form-section -->
+            </div>
         </form>
 
     </div>
 </div>
-{% endblock %}
+{{end}}
 
-{% block extra_js %}
+{{define "extra_js"}}
 <script>
 function toggleCreds() {
     const body = document.getElementById('credBody');
@@ -326,20 +157,12 @@ function toggleCreds() {
     body.classList.toggle('open');
     chevron.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
 }
-
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('jobSearchForm');
-    form.addEventListener('submit', function(e) {
-        const keywords = form.querySelector('input[name="keywords"]').value.trim();
-        if (!keywords) {
-            e.preventDefault();
-            const inp = form.querySelector('input[name="keywords"]');
-            inp.style.borderColor = 'var(--li-red)';
-            inp.focus();
-            return false;
-        }
+    document.getElementById('jobSearchForm').addEventListener('submit', function(e) {
+        const kw = this.querySelector('input[name="keywords"]');
+        if (!kw.value.trim()) { e.preventDefault(); kw.style.borderColor = 'var(--li-red)'; kw.focus(); return false; }
         showLoading();
     });
 });
 </script>
-{% endblock %}
+{{end}}
