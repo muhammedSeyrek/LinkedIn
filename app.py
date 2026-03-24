@@ -4,6 +4,7 @@ import threading
 import json
 import atexit
 from datetime import datetime, timedelta
+from urllib.parse import quote_plus
 import uuid
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
@@ -72,11 +73,8 @@ class EnhancedLinkedInJobScraper:
         chrome_options.add_argument("--disable-extensions")
         chrome_options.add_argument("--disable-plugins")
         chrome_options.add_argument("--disable-images")  # Performans için
-        chrome_options.add_argument("--disable-javascript")  # Opsiyonel
-        
         # Memory optimizasyonu
         chrome_options.add_argument("--memory-pressure-off")
-        chrome_options.add_argument("--max_old_space_size=4096")
         
         try:
             # ChromeDriver path - Cloud Run'da /usr/local/bin/chromedriver, local'de PATH'ten al
@@ -226,10 +224,10 @@ class EnhancedLinkedInJobScraper:
     def build_search_url(self, keywords, location, job_types, experience_levels, remote_options, date_posted):
         """Arama URL'si oluştur"""
         base_url = "https://www.linkedin.com/jobs/search/?"
-        params = [f"keywords={keywords.replace(' ', '%20')}"]
-        
+        params = [f"keywords={quote_plus(keywords)}"]
+
         if location:
-            params.append(f"location={location.replace(' ', '%20')}")
+            params.append(f"location={quote_plus(location)}")
         if job_types:
             params.append("f_JT=" + "%2C".join(job_types))
         if experience_levels:

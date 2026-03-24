@@ -1,168 +1,264 @@
 {% extends "base.html" %}
 
-{% block title %}Ana Sayfa{% endblock %}
+{% block title %}İş Arama{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: var(--li-surface);
+        border-radius: var(--li-radius);
+        box-shadow: var(--li-shadow);
+        padding: 40px 32px 32px;
+        margin-bottom: 16px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--li-blue) 0%, #38a1f3 100%);
+    }
+
+    .hero-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--li-text);
+        margin-bottom: 6px;
+        line-height: 1.3;
+    }
+
+    .hero-sub {
+        font-size: 16px;
+        color: var(--li-text-sub);
+        margin-bottom: 0;
+    }
+
+    .form-section {
+        background: var(--li-surface);
+        border-radius: var(--li-radius);
+        box-shadow: var(--li-shadow);
+        overflow: hidden;
+    }
+
+    .form-section-header {
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid var(--li-border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-section-header h2 {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--li-text);
+        margin: 0;
+    }
+
+    .form-section-body { padding: 20px 24px 24px; }
+
+    .filter-group-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--li-text-sub);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .filter-group {
+        padding: 16px;
+        background: var(--li-bg);
+        border-radius: 6px;
+        height: 100%;
+    }
+
+    .li-select {
+        width: 100%;
+        border: 1px solid var(--li-text-sub);
+        border-radius: 4px;
+        padding: 10px 12px;
+        font-size: 14px;
+        font-family: inherit;
+        color: var(--li-text);
+        background: var(--li-surface);
+        outline: none;
+        transition: border-color .15s, box-shadow .15s;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px;
+    }
+
+    .li-select:focus {
+        border-color: var(--li-blue);
+        box-shadow: 0 0 0 2px rgba(10,102,194,.15);
+    }
+
+    .credentials-section {
+        border: 1px solid var(--li-border);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .credentials-header {
+        background: var(--li-bg);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        user-select: none;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--li-text);
+        border-bottom: 1px solid var(--li-border);
+    }
+
+    .credentials-header:hover { background: #ebebeb; }
+
+    .credentials-body { padding: 16px; display: none; }
+    .credentials-body.open { display: block; }
+
+    .submit-bar {
+        padding: 16px 24px;
+        border-top: 1px solid var(--li-border);
+        background: var(--li-surface);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .submit-bar .hint {
+        font-size: 12px;
+        color: var(--li-text-sub);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-10">
-        <!-- Intro Section -->
-        <div class="card mb-4">
-            <div class="card-body text-center py-5" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
-                <h1 class="display-4 mb-3">LinkedIn İş Arama Asistanı</h1>
-                <p class="lead mb-4">LinkedIn'deki iş ilanlarını otomatik olarak tarayın, analiz edin ve kaydedin.</p>
-                <div class="row justify-content-center">
-                    <div class="col-md-8">
-                        <div class="d-flex justify-content-center gap-3">
-                            <a href="#search-form" class="btn btn-primary btn-lg">
-                                <i class="fas fa-search me-2"></i>Aramaya Başla
-                            </a>
-                            <a href="{{ url_for('jobs_list') }}" class="btn btn-outline-primary btn-lg">
-                                <i class="fas fa-history me-2"></i>Önceki Aramalar
-                            </a>
-                        </div>
-                    </div>
+    <div class="col-lg-9 col-xl-8">
+
+        <!-- Hero -->
+        <div class="hero-section mb-4">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <i class="fab fa-linkedin" style="font-size:48px;color:var(--li-blue);"></i>
+                <div>
+                    <h1 class="hero-title">LinkedIn İş Arama Asistanı</h1>
+                    <p class="hero-sub">İş ilanlarını otomatik tara, filtrele ve CSV olarak indir.</p>
                 </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ url_for('jobs_list') }}" class="btn-li-secondary" style="font-size:14px;padding:5px 16px;">
+                    <i class="fas fa-history"></i> Önceki Aramalar
+                </a>
             </div>
         </div>
 
         <!-- Search Form -->
-        <div class="card" id="search-form">
-            <div class="card-body">
-                <h2 class="card-title mb-4">İş Arama Kriterleri</h2>
-                <form action="{{ url_for('start_search') }}" method="POST" id="jobSearchForm">
-                    <!-- Temel Arama -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">Anahtar Kelimeler <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="keywords" required
-                                    placeholder="Örn: Python Developer, Data Scientist">
-                                <div class="form-text">Pozisyon, beceri veya şirket adı girebilirsiniz</div>
-                            </div>
+        <form action="{{ url_for('start_search') }}" method="POST" id="jobSearchForm">
+            <div class="form-section" id="search-form">
+
+                <!-- Temel arama -->
+                <div class="form-section-header">
+                    <i class="fas fa-search" style="color:var(--li-blue);font-size:16px;"></i>
+                    <h2>Arama Kriterleri</h2>
+                </div>
+                <div class="form-section-body">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-7">
+                            <label class="li-form-label">
+                                Anahtar Kelimeler <span style="color:var(--li-red)">*</span>
+                            </label>
+                            <input type="text" class="li-form-control" name="keywords" required
+                                   placeholder="Örn: Python Developer, Data Scientist, UX Designer">
+                            <p class="li-form-hint">Pozisyon, beceri veya şirket adı girebilirsiniz</p>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">Lokasyon</label>
-                                <input type="text" class="form-control" name="location"
-                                    placeholder="Örn: İstanbul, Türkiye">
-                                <div class="form-text">Boş bırakırsanız tüm lokasyonlarda arama yapılır</div>
-                            </div>
+                        <div class="col-md-5">
+                            <label class="li-form-label">Lokasyon</label>
+                            <input type="text" class="li-form-control" name="location"
+                                   placeholder="Örn: İstanbul, Türkiye">
+                            <p class="li-form-hint">Boş bırakırsanız tüm lokasyonlar</p>
                         </div>
                     </div>
 
-                    <!-- Detaylı Filtreler -->
-                    <div class="row mb-4">
+                    <hr class="li-divider">
+
+                    <!-- Filtreler -->
+                    <p class="filter-group-title mb-3">Gelişmiş Filtreler</p>
+                    <div class="row g-3 mb-4">
+
                         <!-- İş Türü -->
                         <div class="col-md-4">
-                            <label class="form-label">İş Türü</label>
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="job_types" value="F" id="fullTime">
-                                        <label class="form-check-label" for="fullTime">
-                                            <i class="fas fa-business-time me-2"></i>Tam Zamanlı
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="job_types" value="P" id="partTime">
-                                        <label class="form-check-label" for="partTime">
-                                            <i class="fas fa-clock me-2"></i>Yarı Zamanlı
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="job_types" value="C" id="contract">
-                                        <label class="form-check-label" for="contract">
-                                            <i class="fas fa-file-contract me-2"></i>Sözleşmeli
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="job_types" value="T" id="temporary">
-                                        <label class="form-check-label" for="temporary">
-                                            <i class="fas fa-hourglass-half me-2"></i>Geçici
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="job_types" value="I" id="internship">
-                                        <label class="form-check-label" for="internship">
-                                            <i class="fas fa-graduation-cap me-2"></i>Staj
-                                        </label>
-                                    </div>
-                                </div>
+                            <div class="filter-group">
+                                <p class="filter-group-title">İş Türü</p>
+                                <label class="li-check">
+                                    <input type="checkbox" name="job_types" value="F"> Tam Zamanlı
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="job_types" value="P"> Yarı Zamanlı
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="job_types" value="C"> Sözleşmeli
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="job_types" value="T"> Geçici
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="job_types" value="I"> Staj
+                                </label>
                             </div>
                         </div>
 
-                        <!-- Deneyim Seviyesi -->
+                        <!-- Deneyim -->
                         <div class="col-md-4">
-                            <label class="form-label">Deneyim Seviyesi</label>
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="1" id="internLevel">
-                                        <label class="form-check-label" for="internLevel">
-                                            <i class="fas fa-seedling me-2"></i>Stajyer
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="2" id="entryLevel">
-                                        <label class="form-check-label" for="entryLevel">
-                                            <i class="fas fa-baby me-2"></i>Yeni Mezun
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="3" id="associate">
-                                        <label class="form-check-label" for="associate">
-                                            <i class="fas fa-user me-2"></i>Orta Düzey
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="4" id="midSenior">
-                                        <label class="form-check-label" for="midSenior">
-                                            <i class="fas fa-user-tie me-2"></i>Kıdemli
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="experience_levels" value="5" id="director">
-                                        <label class="form-check-label" for="director">
-                                            <i class="fas fa-chess-king me-2"></i>Direktör
-                                        </label>
-                                    </div>
-                                </div>
+                            <div class="filter-group">
+                                <p class="filter-group-title">Deneyim Seviyesi</p>
+                                <label class="li-check">
+                                    <input type="checkbox" name="experience_levels" value="1"> Stajyer
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="experience_levels" value="2"> Yeni Mezun
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="experience_levels" value="3"> Orta Düzey
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="experience_levels" value="4"> Kıdemli
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="experience_levels" value="5"> Direktör+
+                                </label>
                             </div>
                         </div>
 
-                        <!-- Uzaktan Çalışma -->
+                        <!-- Remote -->
                         <div class="col-md-4">
-                            <label class="form-label">Uzaktan Çalışma</label>
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="remote_options" value="1" id="remote">
-                                        <label class="form-check-label" for="remote">
-                                            <i class="fas fa-home me-2"></i>Uzaktan
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="remote_options" value="2" id="hybrid">
-                                        <label class="form-check-label" for="hybrid">
-                                            <i class="fas fa-building-user me-2"></i>Hibrit
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="remote_options" value="3" id="onsite">
-                                        <label class="form-check-label" for="onsite">
-                                            <i class="fas fa-building me-2"></i>Ofiste
-                                        </label>
-                                    </div>
-                                </div>
+                            <div class="filter-group">
+                                <p class="filter-group-title">Çalışma Şekli</p>
+                                <label class="li-check">
+                                    <input type="checkbox" name="remote_options" value="1"> Uzaktan
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="remote_options" value="2"> Hibrit
+                                </label>
+                                <label class="li-check">
+                                    <input type="checkbox" name="remote_options" value="3"> Ofiste
+                                </label>
                             </div>
                         </div>
                     </div>
 
-                    <!-- İlan Tarihi -->
-                    <div class="row mb-4">
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">İlan Tarihi</label>
-                            <select class="form-select" name="date_posted">
+                            <label class="li-form-label">İlan Tarihi</label>
+                            <select class="li-select" name="date_posted">
                                 <option value="">Tüm Zamanlar</option>
                                 <option value="r86400">Son 24 Saat</option>
                                 <option value="r604800">Son 1 Hafta</option>
@@ -170,85 +266,80 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Sayfa Sayısı</label>
-                            <input type="number" class="form-control" name="max_pages" value="5" min="1" max="20">
-                            <div class="form-text">Her sayfada yaklaşık 25 ilan listelenir</div>
+                            <label class="li-form-label">Sayfa Sayısı</label>
+                            <input type="number" class="li-form-control" name="max_pages" value="5" min="1" max="20">
+                            <p class="li-form-hint">Her sayfada ~25 ilan (max 20)</p>
                         </div>
                     </div>
 
-                    <!-- LinkedIn Giriş Bilgileri (Opsiyonel) -->
-                    <div class="card mb-4 border-info">
-                        <div class="card-header bg-info bg-opacity-10 border-info">
-                            <h5 class="card-title mb-0">
-                                <i class="fab fa-linkedin me-2"></i>LinkedIn Giriş Bilgileri (Opsiyonel)
-                            </h5>
+                    <!-- LinkedIn Credentials -->
+                    <div class="credentials-section">
+                        <div class="credentials-header" id="credToggle" onclick="toggleCreds()">
+                            <i class="fab fa-linkedin" style="color:var(--li-blue);font-size:18px;"></i>
+                            LinkedIn Hesabı ile Giriş <span style="color:var(--li-text-sub);font-weight:400;">(Opsiyonel)</span>
+                            <i class="fas fa-chevron-down ms-auto" id="credChevron" style="font-size:11px;transition:transform .2s;"></i>
                         </div>
-                        <div class="card-body">
-                            <p class="card-text text-muted mb-3">
-                                LinkedIn hesabınızla giriş yaparak daha fazla iş ilanına erişebilirsiniz.
-                                Bilgileriniz güvenli bir şekilde saklanır ve sadece arama için kullanılır.
+                        <div class="credentials-body" id="credBody">
+                            <p style="font-size:13px;color:var(--li-text-sub);margin-bottom:12px;">
+                                LinkedIn hesabınızla giriş yaparak daha fazla ilana erişebilirsiniz.
+                                Bilgileriniz sadece bu arama için kullanılır ve saklanmaz.
                             </p>
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">LinkedIn E-posta</label>
-                                        <input type="email" class="form-control" name="email" placeholder="ornek@email.com">
-                                    </div>
+                                    <label class="li-form-label">E-posta</label>
+                                    <input type="email" class="li-form-control" name="email"
+                                           placeholder="ornek@email.com" autocomplete="username">
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">LinkedIn Şifre</label>
-                                        <input type="password" class="form-control" name="password">
-                                    </div>
+                                    <label class="li-form-label">Şifre</label>
+                                    <input type="password" class="li-form-control" name="password"
+                                           autocomplete="current-password">
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Submit Button -->
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-search me-2"></i>Aramayı Başlat
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <!-- Submit bar -->
+                <div class="submit-bar">
+                    <p class="hint mb-0">
+                        <i class="fas fa-info-circle me-1" style="color:var(--li-blue);"></i>
+                        Arama arkaplanda çalışır, sayfayı kapatabilirsiniz.
+                    </p>
+                    <button type="submit" class="btn-li-primary">
+                        <i class="fas fa-search"></i> Aramayı Başlat
+                    </button>
+                </div>
+
+            </div><!-- /.form-section -->
+        </form>
+
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
+function toggleCreds() {
+    const body = document.getElementById('credBody');
+    const chevron = document.getElementById('credChevron');
+    body.classList.toggle('open');
+    chevron.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Form validation
     const form = document.getElementById('jobSearchForm');
-    form.addEventListener('submit', function(event) {
+    form.addEventListener('submit', function(e) {
         const keywords = form.querySelector('input[name="keywords"]').value.trim();
         if (!keywords) {
-            event.preventDefault();
-            alert('Lütfen en az bir anahtar kelime girin.');
+            e.preventDefault();
+            const inp = form.querySelector('input[name="keywords"]');
+            inp.style.borderColor = 'var(--li-red)';
+            inp.focus();
             return false;
         }
         showLoading();
     });
-
-    // Checkbox group validation
-    const jobTypeChecks = document.querySelectorAll('input[name="job_types"]');
-    const expLevelChecks = document.querySelectorAll('input[name="experience_levels"]');
-    const remoteChecks = document.querySelectorAll('input[name="remote_options"]');
-
-    function validateCheckboxGroup(checkboxes) {
-        return Array.from(checkboxes).some(cb => cb.checked);
-    }
-
-    // Smooth scroll to search form
-    document.querySelector('a[href="#search-form"]').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.querySelector('#search-form').scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
 });
 </script>
-{% endblock %}
 {% endblock %}
