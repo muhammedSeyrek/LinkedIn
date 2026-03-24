@@ -8,10 +8,8 @@ from urllib.parse import quote_plus
 import uuid
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
-from selenium import webdriver
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
@@ -56,43 +54,26 @@ class EnhancedLinkedInJobScraper:
     
     def setup_driver(self):
         """Selenium driver'ı kur"""
-        chrome_options = Options()
-        
-        if self.headless:
-            chrome_options.add_argument("--headless=new")
+        options = uc.ChromeOptions()
 
-        chrome_options.add_argument(f"--user-agent={self.user_agent}")
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        chrome_options.add_experimental_option("useAutomationExtension", False)
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--no-zygote")
-        chrome_options.add_argument("--disable-notifications")
-        chrome_options.add_argument("--disable-popup-blocking")
-        chrome_options.add_argument("--disable-extensions")
-        chrome_options.add_argument("--disable-plugins")
-        chrome_options.add_argument("--disable-images")
-        chrome_options.add_argument("--window-size=1920,1080")
-        
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--disable-notifications")
+        options.add_argument("--window-size=1920,1080")
+
+        chrome_bin = os.environ.get('CHROME_BIN')
+        if chrome_bin:
+            options.binary_location = chrome_bin
+
         try:
-            chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', 'chromedriver')
-            chrome_bin = os.environ.get('CHROME_BIN')
-            if chrome_bin:
-                chrome_options.binary_location = chrome_bin
-
-            self.driver = webdriver.Chrome(
-                service=Service(chromedriver_path),
-                options=chrome_options
+            self.driver = uc.Chrome(
+                options=options,
+                headless=self.headless,
+                use_subprocess=False,
             )
             self.wait = WebDriverWait(self.driver, Config.SELENIUM_TIMEOUT)
-            
-            # Selenium tespitini atlatmak için
-            self.driver.execute_cdp_cmd('Network.setUserAgentOverride', 
-                                      {"userAgent": self.user_agent})
-            self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-            
+
         except Exception as e:
             raise Exception(f"Chrome driver kurulum hatası: {str(e)}")
     
