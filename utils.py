@@ -179,19 +179,39 @@ def generate_user_agent():
 def detect_captcha_or_blocking(driver):
     """Captcha veya engellenme durumunu tespit et"""
     try:
-        page_source = driver.page_source
-        page_text = page_source.lower()
-        captcha_indicators = ['captcha', 'are you a robot', 'unusual traffic', 'verify you are human', 'security verification']
+        current_url = driver.current_url
 
-        for indicator in captcha_indicators:
-            if indicator in page_text:
-                idx = page_text.find(indicator)
-                snippet = page_source[max(0, idx - 80):idx + 120].replace('\n', ' ')
-                logger.warning(f"[BOT TESPİTİ] Indicator: '{indicator}' | URL: {driver.current_url}")
-                logger.warning(f"[BOT TESPİTİ] Snippet: ...{snippet}...")
+        # 1. URL kontrolü — en güvenilir yöntem
+        if '/checkpoint/' in current_url or '/authwall/' in current_url:
+            logger.warning(f"[BOT TESPİTİ] Engel URL'si: {current_url}")
+            return True
+
+        # 2. Sayfa başlığı iş sonuçları içeriyorsa kesinlikle engel yok
+        page_title = driver.title.lower()
+        if 'jobs' in page_title and any(c.isdigit() for c in page_title):
+            logger.info(f"[BOT YOK] İş sayfası yüklendi: '{driver.title}'")
+            return False
+
+        # 3. Görünür metin kontrolü (innerHTML değil, innerText kullan — attribute isimlerini atla)
+        try:
+            visible_text = driver.execute_script(
+                "return document.body ? document.body.innerText.toLowerCase() : ''"
+            )
+        except Exception:
+            visible_text = ''
+
+        blocking_phrases = [
+            'are you a robot',
+            'unusual traffic',
+            'verify you are human',
+            "let's do a quick security check",
+        ]
+        for phrase in blocking_phrases:
+            if phrase in visible_text:
+                logger.warning(f"[BOT TESPİTİ] Görünür metin: '{phrase}' | URL: {current_url}")
                 return True
 
-        logger.info(f"[BOT YOK] Sayfa OK | Başlık: '{driver.title}' | URL: {driver.current_url}")
+        logger.info(f"[BOT YOK] Sayfa OK | URL: {current_url}")
     except Exception as e:
         logger.error(f"detect_captcha_or_blocking hatası: {e}")
 

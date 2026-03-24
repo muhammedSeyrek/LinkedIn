@@ -161,12 +161,6 @@ class EnhancedLinkedInJobScraper:
                     })
                 
                 # Captcha kontrolü
-                current_url = self.driver.current_url
-                page_title = self.driver.title
-                import logging as _logging
-                _logging.getLogger(__name__).info(f"[DEBUG] URL: {current_url} | Başlık: {page_title}")
-                with open('/app/temp/last_page.html', 'w', encoding='utf-8') as f:
-                    f.write(self.driver.page_source)
                 if detect_captcha_or_blocking(self.driver):
                     raise Exception("LinkedIn tarafından engellendiniz. Lütfen daha sonra tekrar deneyin.")
                 
