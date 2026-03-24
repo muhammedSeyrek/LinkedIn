@@ -77,8 +77,10 @@ class EnhancedLinkedInJobScraper:
         chrome_options.add_argument("--memory-pressure-off")
         
         try:
-            # ChromeDriver path - Cloud Run'da /usr/local/bin/chromedriver, local'de PATH'ten al
             chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', 'chromedriver')
+            chrome_bin = os.environ.get('CHROME_BIN')
+            if chrome_bin:
+                chrome_options.binary_location = chrome_bin
 
             self.driver = webdriver.Chrome(
                 service=Service(chromedriver_path),
