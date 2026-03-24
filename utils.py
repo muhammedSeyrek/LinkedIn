@@ -179,15 +179,21 @@ def generate_user_agent():
 def detect_captcha_or_blocking(driver):
     """Captcha veya engellenme durumunu tespit et"""
     try:
-        page_text = driver.page_source.lower()
+        page_source = driver.page_source
+        page_text = page_source.lower()
         captcha_indicators = ['captcha', 'are you a robot', 'unusual traffic', 'verify you are human', 'security verification']
 
         for indicator in captcha_indicators:
             if indicator in page_text:
-                logger.warning(f"Bot tespiti tetiklendi: '{indicator}' | URL: {driver.current_url}")
+                idx = page_text.find(indicator)
+                snippet = page_source[max(0, idx - 80):idx + 120].replace('\n', ' ')
+                logger.warning(f"[BOT TESPİTİ] Indicator: '{indicator}' | URL: {driver.current_url}")
+                logger.warning(f"[BOT TESPİTİ] Snippet: ...{snippet}...")
                 return True
+
+        logger.info(f"[BOT YOK] Sayfa OK | Başlık: '{driver.title}' | URL: {driver.current_url}")
     except Exception as e:
-        logger.debug(f"detect_captcha_or_blocking hatası: {e}")
+        logger.error(f"detect_captcha_or_blocking hatası: {e}")
 
     return False
 
