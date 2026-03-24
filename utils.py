@@ -180,7 +180,7 @@ def detect_captcha_or_blocking(driver):
     """Captcha veya engellenme durumunu tespit et"""
     try:
         page_text = driver.page_source.lower()
-        captcha_indicators = ['captcha', 'robot', 'unusual traffic', 'verify you are human']
+        captcha_indicators = ['captcha', 'are you a robot', 'unusual traffic', 'verify you are human', 'security verification', 'security check']
         
         for indicator in captcha_indicators:
             if indicator in page_text:

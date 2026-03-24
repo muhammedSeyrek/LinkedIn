@@ -59,22 +59,22 @@ class EnhancedLinkedInJobScraper:
         chrome_options = Options()
         
         if self.headless:
-            chrome_options.add_argument("--headless")
-        
-        # Performans ve güvenlik ayarları
+            chrome_options.add_argument("--headless=new")
+
         chrome_options.add_argument(f"--user-agent={self.user_agent}")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option("useAutomationExtension", False)
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-zygote")
         chrome_options.add_argument("--disable-notifications")
         chrome_options.add_argument("--disable-popup-blocking")
         chrome_options.add_argument("--disable-extensions")
         chrome_options.add_argument("--disable-plugins")
-        chrome_options.add_argument("--disable-images")  # Performans için
-        # Memory optimizasyonu
-        chrome_options.add_argument("--memory-pressure-off")
+        chrome_options.add_argument("--disable-images")
+        chrome_options.add_argument("--window-size=1920,1080")
         
         try:
             chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', 'chromedriver')
