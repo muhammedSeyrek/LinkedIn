@@ -1,13 +1,10 @@
-# LinkedIn Job Scraper - Google Cloud Run için Dockerfile
 FROM python:3.11-slim
 
-# Çalışma dizini
 WORKDIR /app
 
-# Sistem bağımlılıklarını yükle (Chrome ve dependencies)
+# Chrome ve Selenium için sistem bağımlılıkları
 RUN apt-get update && apt-get install -y \
     wget \
-    gnupg \
     unzip \
     curl \
     ca-certificates \
@@ -38,46 +35,26 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# ChromeDriver'ı manuel olarak yükle (webdriver-manager yerine)
+# Chrome versiyonuyla eşleşen ChromeDriver kur
 RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1) \
-    && echo "Chrome version: $CHROME_VERSION" \
     && CHROMEDRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_VERSION}") \
-    && echo "ChromeDriver version: $CHROMEDRIVER_VERSION" \
     && wget -q "https://storage.googleapis.com/chrome-for-testing-public/${CHROMEDRIVER_VERSION}/linux64/chromedriver-linux64.zip" \
     && unzip chromedriver-linux64.zip \
     && mv chromedriver-linux64/chromedriver /usr/local/bin/ \
     && chmod +x /usr/local/bin/chromedriver \
     && rm -rf chromedriver-linux64.zip chromedriver-linux64
 
-# Chrome driver için environment variables
 ENV CHROME_BIN=/usr/bin/google-chrome \
-    CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
+    CHROMEDRIVER_PATH=/usr/local/bin/chromedriver \
+    PYTHONUNBUFFERED=1
 
-# Python bağımlılıklarını kopyala ve yükle
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Uygulama dosyalarını kopyala
 COPY . .
 
-# Gerekli klasörleri oluştur
-RUN mkdir -p logs static/results temp && \
-    chmod -R 777 logs static/results temp
+RUN mkdir -p logs static/results temp
 
-# Cloud Run için port (Cloud Run PORT environment variable'ını kullanır)
-ENV PORT=8080
-ENV FLASK_APP=app.py
-ENV SELENIUM_HEADLESS=True
-ENV PYTHONUNBUFFERED=1
+EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:${PORT}/ || exit 1
-
-# Non-root user oluştur (güvenlik için)
-RUN useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
-USER appuser
-
-# Cloud Run otomatik olarak PORT environment variable'ı atar
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 4 --timeout 0 app:app
+CMD ["python", "app.py"]
