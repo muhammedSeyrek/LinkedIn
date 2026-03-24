@@ -670,7 +670,13 @@ def download_results(job_id):
         return redirect(url_for('jobs_list'))
     
     try:
-        return send_file(job['result_file'], as_attachment=True)
+        filename = os.path.basename(job['result_file'])
+        return send_file(
+            job['result_file'],
+            as_attachment=True,
+            download_name=filename,
+            mimetype='text/csv'
+        )
     except Exception as e:
         flash(f'Dosya indirme hatası: {str(e)}', 'danger')
         return redirect(url_for('jobs_list'))
