@@ -297,7 +297,9 @@ func deleteJobHandler(c *gin.Context) {
 
 // ── Scraper ───────────────────────────────────────────────────────────────────
 
-func buildSearchURL(p SearchParams) string {
+// buildPageURL builds the LinkedIn jobs search URL for a specific page.
+// LinkedIn paginates via ?start=N where N = (page-1)*25.
+func buildPageURL(p SearchParams, pageNum int) string {
 	u, _ := url.Parse("https://www.linkedin.com/jobs/search/")
 	q := u.Query()
 	q.Set("keywords", p.Keywords)
@@ -315,6 +317,9 @@ func buildSearchURL(p SearchParams) string {
 	}
 	if p.DatePosted != "" {
 		q.Set("f_TPR", p.DatePosted)
+	}
+	if pageNum > 1 {
+		q.Set("start", fmt.Sprintf("%d", (pageNum-1)*25))
 	}
 	u.RawQuery = q.Encode()
 	return u.String()
@@ -399,22 +404,23 @@ func runScraper(jobID string, params SearchParams) {
 	page := stealth.MustPage(browser)
 	defer page.MustClose()
 
-	updateJob(jobID, func(j *JobRecord) { j.Message = "Arama sayfası yükleniyor..." })
-	if err := page.Navigate(buildSearchURL(params)); err != nil {
-		updateJob(jobID, func(j *JobRecord) { j.Status = "failed"; j.Error = "Sayfa yüklenemedi: " + err.Error(); j.Message = j.Error })
-		return
-	}
-	page.MustWaitLoad()
-	time.Sleep(2 * time.Second)
-
 	var allFound []Job
 
 	for cur := 1; cur <= params.MaxPages; cur++ {
+		pageURL := buildPageURL(params, cur)
 		updateJob(jobID, func(j *JobRecord) {
 			j.Page = cur
 			j.Progress = float64(cur-1) / float64(params.MaxPages) * 100
-			j.Message = fmt.Sprintf("Sayfa %d / %d taranıyor...", cur, params.MaxPages)
+			j.Message = fmt.Sprintf("Sayfa %d / %d yükleniyor...", cur, params.MaxPages)
 		})
+
+		if err := page.Navigate(pageURL); err != nil {
+			log.Printf("Sayfa %d navigasyon hatası: %v", cur, err)
+			break
+		}
+		// Wait for page to be ready (up to 15s), then extra settle time
+		page.Timeout(15 * time.Second).MustWaitLoad()
+		time.Sleep(3 * time.Second)
 
 		if isBlocked(page) {
 			updateJob(jobID, func(j *JobRecord) {
@@ -428,28 +434,32 @@ func runScraper(jobID string, params SearchParams) {
 		pageJobs := extractJobsFromPage(page)
 		allFound = append(allFound, pageJobs...)
 		log.Printf("Sayfa %d: %d ilan (toplam: %d)", cur, len(pageJobs), len(allFound))
-		updateJob(jobID, func(j *JobRecord) { j.FoundJobs = len(allFound) })
+		updateJob(jobID, func(j *JobRecord) {
+			j.FoundJobs = len(allFound)
+			j.Message = fmt.Sprintf("Sayfa %d / %d tarandı — %d ilan", cur, params.MaxPages, len(allFound))
+		})
 
-		if cur < params.MaxPages {
-			if !goToNextPage(page) {
-				log.Printf("Sonraki sayfa yok, sayfa %d'de duruldu", cur)
-				break
-			}
-			time.Sleep(2 * time.Second)
+		// Stop early if last page returned 0 cards (no more results)
+		if len(pageJobs) == 0 {
+			log.Printf("Sayfa %d boş, daha fazla sonuç yok", cur)
+			break
 		}
 	}
 
 	timestamp := time.Now().Format("20060102_150405")
 	filename := fmt.Sprintf("static/results/linkedin_jobs_%s_%s.csv", jobID, timestamp)
+	savedFile := ""
 	if err := saveCSV(allFound, filename); err != nil {
 		log.Printf("CSV kaydetme hatası: %v", err)
+	} else {
+		savedFile = filename
 	}
 
 	updateJob(jobID, func(j *JobRecord) {
 		j.Status = "completed"
 		j.Progress = 100
 		j.FoundJobs = len(allFound)
-		j.ResultFile = filename
+		j.ResultFile = savedFile
 		j.Message = fmt.Sprintf("Arama tamamlandı! %d ilan bulundu.", len(allFound))
 	})
 }
@@ -485,26 +495,43 @@ func loginLinkedIn(browser *rod.Browser, email, password string) bool {
 }
 
 func extractJobsFromPage(page *rod.Page) []Job {
-	// Gradually scroll to load lazy-rendered cards
+	// Scroll gradually to trigger lazy-loaded cards
 	page.MustEval(`async () => {
 		for (let y = 0; y < document.body.scrollHeight; y += 400) {
 			window.scrollTo(0, y);
-			await new Promise(r => setTimeout(r, 120));
+			await new Promise(r => setTimeout(r, 100));
 		}
 	}`)
 	time.Sleep(1500 * time.Millisecond)
 
+	info, _ := page.Info()
+	log.Printf("[EXTRACT] URL: %s | Başlık: %s", info.URL, info.Title)
+
+	// Try each selector set and use whichever finds cards
+	// Ordered: public LinkedIn first, then logged-in LinkedIn
+	selectorSets := []string{
+		"ul.jobs-search__results-list > li",          // public (not logged-in)
+		".job-search-card",                            // public card wrapper
+		"li[data-occludable-job-id]",                 // logged-in
+		".jobs-search-results__list-item",             // logged-in
+		".scaffold-layout__list-container li",         // logged-in, newer layout
+		"div[data-job-id]",                            // fallback
+	}
+
 	var cards rod.Elements
-	for _, sel := range []string{
-		"li[data-occludable-job-id]",
-		".jobs-search-results__list-item",
-		".scaffold-layout__list-item",
-		".job-search-card",
-	} {
+	for _, sel := range selectorSets {
 		els, err := page.Elements(sel)
 		if err == nil && len(els) > 0 {
+			log.Printf("[EXTRACT] Selector '%s' ile %d kart bulundu", sel, len(els))
 			cards = els
 			break
+		}
+	}
+
+	if len(cards) == 0 {
+		log.Printf("[EXTRACT] Hiç kart bulunamadı — sayfadaki tüm <li> sayısı kontrol ediliyor")
+		if all, err := page.Elements("li"); err == nil {
+			log.Printf("[EXTRACT] Toplam <li> sayısı: %d", len(all))
 		}
 	}
 
@@ -521,12 +548,19 @@ func extractJobsFromPage(page *rod.Page) []Job {
 func extractJobFromCard(card *rod.Element) Job {
 	var j Job
 
-	for _, sel := range []string{
+	// ── Title + link ──────────────────────────────────────────────────────────
+	// Public LinkedIn:  .base-search-card__title (h3), link via a.base-card__full-link
+	// Logged-in:        .job-card-list__title--link (a with aria-label)
+	titleSelectors := []string{
+		"h3.base-search-card__title",
+		".base-search-card__title",
 		".job-card-list__title--link",
 		".job-card-list__title",
 		".job-card-container__link",
 		"h3 a",
-	} {
+		"h3",
+	}
+	for _, sel := range titleSelectors {
 		el, err := card.Element(sel)
 		if err != nil {
 			continue
@@ -536,7 +570,13 @@ func extractJobFromCard(card *rod.Element) Job {
 			continue
 		}
 		j.Title = strings.TrimSpace(text)
+		// Grab href from this element or nearest anchor
 		href, _ := el.Attribute("href")
+		if href == nil {
+			if a, err := card.Element("a.base-card__full-link"); err == nil {
+				href, _ = a.Attribute("href")
+			}
+		}
 		if href != nil {
 			if strings.HasPrefix(*href, "http") {
 				j.Link = *href
@@ -547,11 +587,16 @@ func extractJobFromCard(card *rod.Element) Job {
 		break
 	}
 
-	for _, sel := range []string{
+	// ── Company ───────────────────────────────────────────────────────────────
+	companySelectors := []string{
+		"h4.base-search-card__subtitle a",
+		"h4.base-search-card__subtitle",
+		".base-search-card__subtitle",
 		".job-card-container__primary-description",
 		".job-card-container__company-name",
 		"h4 a",
-	} {
+	}
+	for _, sel := range companySelectors {
 		el, err := card.Element(sel)
 		if err != nil {
 			continue
@@ -563,10 +608,14 @@ func extractJobFromCard(card *rod.Element) Job {
 		}
 	}
 
-	for _, sel := range []string{
+	// ── Location ──────────────────────────────────────────────────────────────
+	locationSelectors := []string{
+		".job-search-card__location",
+		"span.job-search-card__location",
 		".job-card-container__metadata-item",
 		".artdeco-entity-lockup__caption",
-	} {
+	}
+	for _, sel := range locationSelectors {
 		el, err := card.Element(sel)
 		if err != nil {
 			continue
@@ -578,6 +627,7 @@ func extractJobFromCard(card *rod.Element) Job {
 		}
 	}
 
+	// ── Date ──────────────────────────────────────────────────────────────────
 	if el, err := card.Element("time"); err == nil {
 		dt, _ := el.Attribute("datetime")
 		if dt != nil && *dt != "" {
@@ -588,28 +638,6 @@ func extractJobFromCard(card *rod.Element) Job {
 	}
 
 	return j
-}
-
-func goToNextPage(page *rod.Page) bool {
-	for _, sel := range []string{
-		"button[aria-label='Next']:not([disabled])",
-		".artdeco-pagination__button--next:not([disabled])",
-	} {
-		el, err := page.Element(sel)
-		if err != nil {
-			continue
-		}
-		disabled, _ := el.Attribute("disabled")
-		if disabled != nil {
-			continue
-		}
-		el.MustScrollIntoView()
-		time.Sleep(500 * time.Millisecond)
-		el.MustClick()
-		page.MustWaitLoad()
-		return true
-	}
-	return false
 }
 
 func saveCSV(jobs []Job, filename string) error {
